@@ -1094,25 +1094,20 @@ function encrypt.new_window(...)
 						print('editing...')
 					end)
 
-					local thread = nil
-					coroutine.wrap(function()
-						thread = input_service.InputBegan:Connect(function(input)
-							local focused = input_service:GetFocusedTextBox()
-							if focused then return end
+					encrypt.connections[category.keybind_count] = input_service.InputBegan:Connect(function(input)
+						local focused = input_service:GetFocusedTextBox()
+						if focused then return end
 
-							if keybind.editing then
-								keybind.key = tostring(input.KeyCode):gsub('Enum.KeyCode.', '')
-								button.Text = keybind.key
+						if keybind.editing then
+							keybind.key = tostring(input.KeyCode):gsub('Enum.KeyCode.', '')
+							button.Text = keybind.key
 
-								keybind.editing = false
-							elseif keybind.key ~= '...' and input.KeyCode == Enum.KeyCode[keybind.key] then
-								data.callback()
-							end
-						end)
-
-						encrypt.threads.keybinds[category.keybind_count] = thread
-					end)()
-
+							keybind.editing = false
+						elseif keybind.key ~= '...' and input.KeyCode == Enum.KeyCode[keybind.key] then
+							data.callback()
+						end
+					end)
+					
 					function keybind:Hide()
 						container.Visible = false
 						category.cut(20)
@@ -1809,6 +1804,10 @@ function encrypt:exit()
 				print('Closed thread: '.. thread)
 			end)
 		end
+	end
+
+	for _, connection in encrypt.connections do
+		pcall(function() connection:Disconnect() end)
 	end
 
 	warn('[-] ENCRYPT > CLOSED')
