@@ -13,13 +13,32 @@
 	
 ]]--
 
-local initialize = loadstring(game:HttpGet('https://raw.githubusercontent.com/dooms-scripts/ui-libraries/main/safe-load.lua'))()
+local initialize
+
+local http_get_available = pcall(function()
+	loadstring(game:HttpGet())
+end)
+
+if http_get_available then
+	initialize = loadstring(game:HttpGet('https://raw.githubusercontent.com/dooms-scripts/ui-libraries/main/safe-load.lua'))()
+elseif not http_get_available then
+	initialize = function(...)
+		local __ = {...}
+		__[1].Parent = game.CoreGui
+		
+		if __[2] then
+			for _,i in ipairs(__:GetChildren()) do
+				i.Name = `encrypt:{tostring(math.random(1000000000,999999999))}`
+			end
+		end
+	end
+end	
+
 getgenv = getgenv or getfenv --error('Encrypt could not load.', 999)
-setreadonly = setreadonly or function() end
 
 --> LIBRARY DATA <------------------------------------------
 local encrypt = {
-	version = 'e1.6.2',
+	version = 'e1.6.3',
 	instance = nil,
 	drop_shadow = false,
 	encrypt_names = false,
@@ -80,6 +99,55 @@ local player = players.LocalPlayer
 local mouse = player:GetMouse()
 
 --> FUNCTIONS <---------------------------------------------
+function makeconnection(... : string)
+	encrypt.connections[...] = {}
+	local metadata = encrypt.connections[...]
+	metadata.Connections = {}
+	
+	function metadata:Connect(...)
+		local connection, index = {
+			connected = true,
+			callback = ...,
+		}, #metadata
+		
+		metadata.Connections[index] = connection
+		
+		function connection:Disconnect()
+			metadata.Connections[index].connected = false
+			metadata.Connections[index].callback = nil
+			
+			--table.remove(metadata.Connections, index)
+		end
+		
+		return connection
+	end
+	
+	return metadata
+	
+end
+------------------------------------------------------------
+
+function fireallconnections(connectionGroup, passingargument)
+	for index, connection in connectionGroup.Connections do
+		--# print(index, connection)
+		if type(connection) == 'table' and connection.callback then
+			connection.callback(passingargument)
+		end
+	end
+end
+
+------------------------------------------------------------
+
+function closenilconnections(metadata)
+	for index, Connection in pairs(metadata) do
+		if type(Connection) == 'table' and Connection.callback == nil then
+			table.remove(metadata, index)
+		end
+	end
+end
+
+------------------------------------------------------------
+
 function encrypt.create(instance, properties)
 	local i = Instance.new(instance)
 	for p,v in pairs(properties) do
@@ -93,9 +161,13 @@ function encrypt.create(instance, properties)
 	return i
 end
 
+------------------------------------------------------------
+
 function encrypt.tween(instance, info, property, value)
 	tween_service:Create(instance, info, {[property] = value}):Play()
 end
+
+------------------------------------------------------------
 
 function encrypt.randomize(length)
 	local str = ''
@@ -106,6 +178,8 @@ function encrypt.randomize(length)
 
 	return str
 end
+
+------------------------------------------------------------
 
 function encrypt.overwrite(to_overwrite : {}, overwrite_with : {})
 	for i, v in pairs(overwrite_with) do
@@ -514,7 +588,7 @@ function encrypt.new_window(...)
 					dropdown_count = 0,
 					colorpicker_count = 0,
 				}
-				
+
 				local title_text = title_text or 'Category'
 				local title_alignment = title_alignment or 'Center'
 
@@ -663,7 +737,7 @@ function encrypt.new_window(...)
 						text = 'toggle',
 						yield = false,
 						callback = function()
-							warn(string.format('[â—] Toggle #%d > no callback set.', category.toggle_count))
+							warn(string.format('[!] Toggle #%d > no callback set.', category.toggle_count))
 						end,
 					}
 
@@ -685,10 +759,10 @@ function encrypt.new_window(...)
 							end
 						end
 					end
-					
+
 					function toggle.OnValueChanged:Connect(...)
 						toggle.Methods:FilterConnections()
-						
+
 						local Connection = {}
 						local Connected = true
 						local Callback = ...
@@ -824,7 +898,6 @@ function encrypt.new_window(...)
 					end
 
 					category.append(20)
-					setreadonly(toggle.Methods, true)
 					return toggle
 				end
 
@@ -834,7 +907,7 @@ function encrypt.new_window(...)
 					local text_button, default = {}, {
 						text = 'button',
 						callback = function()
-							warn(string.format('[â—] Button #%d > no callback set.', category.button_count))
+							warn(string.format('[!] Button #%d > no callback set.', category.button_count))
 						end,
 					}
 
@@ -913,7 +986,7 @@ function encrypt.new_window(...)
 						text = 'button',
 						placeholder_text = '...',
 						callback = function()
-							warn(string.format('[â—] Textbox #%d > no callback set.', category.textbox_count))
+							warn(string.format('[!] Textbox #%d > no callback set.', category.textbox_count))
 						end,
 					}
 
@@ -1023,7 +1096,7 @@ function encrypt.new_window(...)
 						text = 'keybind',
 						keybind = '...',
 						callback = function()
-							warn(string.format('[â—] Keybind #%d > no callback set.', category.keybind_count))
+							warn(string.format('[!] Keybind #%d > no callback set.', category.keybind_count))
 						end,
 					}
 
@@ -1091,10 +1164,10 @@ function encrypt.new_window(...)
 					button.MouseButton1Click:Connect(function()
 						keybind.editing = true
 						button.Text = '...'
-						print('editing...')
+						-->> print('editing...')
 					end)
 
-					encrypt.connections[`keybind{category.keybind_count}`] = input_service.InputBegan:Connect(function(input)
+					local inputConnection = input_service.InputBegan:Connect(function(input)
 						local focused = input_service:GetFocusedTextBox()
 						if focused then return end
 
@@ -1107,9 +1180,9 @@ function encrypt.new_window(...)
 							data.callback()
 						end
 					end)
-
-					print('made keybind connection')
 					
+					encrypt.threads.keybinds[`keybindConnection{category.keybind_count}`] = inputConnection
+
 					function keybind:Hide()
 						container.Visible = false
 						category.cut(20)
@@ -1125,8 +1198,7 @@ function encrypt.new_window(...)
 					end
 
 					function keybind:Disconnect()
-						local thread = encrypt.connections[`keybind{category.keybind_count}`]
-						thread:Disconnect()
+						inputConnection:Disconnect()
 					end
 
 					function keybind:Destroy()
@@ -1147,7 +1219,7 @@ function encrypt.new_window(...)
 						max = 100,
 						allow_decimals = false,
 						callback = function()
-							warn(string.format('[â—] Slider #%d > no callback set.', category.slider_count))
+							warn(string.format('[!] Slider #%d > no callback set.', category.slider_count))
 						end,
 					}
 
@@ -1335,7 +1407,7 @@ function encrypt.new_window(...)
 						options = {},
 						default_selection = nil,
 						callback = function()
-							warn(string.format('[â—] Dropdown #%d > no callback set.', category.dropdown_count))
+							warn(string.format('[!] Dropdown #%d > no callback set.', category.dropdown_count))
 						end,
 					}
 
@@ -1521,7 +1593,7 @@ function encrypt.new_window(...)
 						text = 'color picker',
 						default_color = Color3.fromRGB(255, 255, 255),
 						callback = function() 
-							warn(string.format('[â—] Color Picker #%d > no callback set.', category.colorpicker_count))
+							warn(string.format('[!] Color Picker #%d > no callback set.', category.colorpicker_count))
 						end,
 					}
 
@@ -1772,7 +1844,74 @@ function encrypt.new_window(...)
 						CategoryFrame.Size += UDim2.new(0, 0, instance.Size.Y.Scale, instance.Size.Y.Offset)
 					end)
 				end
+				
+				function category.new_searchbar()
+					local container = encrypt.create("Frame", {
+						Parent = CategoryFrame;
+						BorderSizePixel = 0;
+						Size = UDim2.new(1, 0, 0, 20);
+						BorderColor3 = Color3.fromRGB(0, 0, 0);
+						LayoutOrder = 4;
+						Name = [[searchbar]];
+						Position = UDim2.new(0, 0, 0.13333334, 0);
+						BackgroundTransparency = 1;
+						BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+					})
 
+					local searchInput = encrypt.create("TextBox", {
+						CursorPosition = -1;
+						PlaceholderColor3 = Color3.fromRGB(152, 152, 152);
+						BorderSizePixel = 0;
+						BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+						Parent = container;
+						TextXAlignment = Enum.TextXAlignment.Left;
+						PlaceholderText = [[Search...]];
+						TextSize = 12;
+						Size = UDim2.new(0, 136, 0, 20);
+						TextColor3 = Color3.fromRGB(255, 255, 255);
+						BorderColor3 = Color3.fromRGB(0, 0, 0);
+						Text = [[]];
+						Font = Enum.Font.GothamMedium;
+						BackgroundTransparency = 1;
+					})
+
+					encrypt.create("ImageLabel", {
+						Parent = container;
+						BackgroundTransparency = 1;
+						AnchorPoint = Vector2.new(1, 0.5);
+						Image = [[http://www.roblox.com/asset/?id=6031154871]];
+						BorderSizePixel = 0;
+						Size = UDim2.new(0, 16, 0, 16);
+						BorderColor3 = Color3.fromRGB(0, 0, 0);
+						ImageColor3 = Color3.fromRGB(152, 152, 152);
+						Position = UDim2.new(1, 0, 0.5, 0);
+						BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+					})
+
+					encrypt.create("UICorner", {
+						Parent = container;
+						CornerRadius = UDim.new(0, 2);
+					})
+					
+					searchInput.Changed:Connect(function()
+						local query = searchInput.Text
+
+						for _, element in CategoryFrame:GetChildren() do
+							if element ~= container then
+								if element:IsA('Frame') then
+									element.Visible = false
+								end
+
+								if element:FindFirstChild('text') then
+									if element.text.Text:match(query) then
+										element.Visible = true
+									end
+								end
+							end
+						end
+					end)
+				end
+				
 				return category
 			end
 
@@ -1790,28 +1929,25 @@ function encrypt.new_window(...)
 	return window
 end
 
+encrypt.OnLoaded = makeconnection('OnLoaded')
+
 function encrypt:exit()
 	encrypt.instance:Destroy()
-
-	for index, connection in encrypt.connections do
-		pcall(function() 
-			connection:Disconnect() 
-			print(`closed: {index}`)
-		end)
-	end
 
 	for _, t in pairs(encrypt.threads) do
 		if pcall(function() coroutine.close(t) end) then print("Closed thread: " .. t) end
 
 		for i, thread in pairs(t) do
 			pcall(function()
+				-- print(i, thread)
 				task.cancel(t[i])
-				print('Closed thread: '.. thread)
+				print('Closed thread: '.. i)
 			end)
 
 			pcall(function()
+				-- print(i, thread)
 				thread:Disconnect()
-				print('Closed thread: '.. thread)
+				print('Closed thread: '.. i)
 			end)
 		end
 	end
@@ -1828,13 +1964,14 @@ getgenv().ENCRYPT_INSTANCE = encrypt.instance
 
 if not pcall(function() initialize(getgenv().ENCRYPT_INSTANCE, false) end) then
 	warn('[!] ENCRYPT > Could not initialize encrypt')
+	-->> getgenv().ENCRYPT_INSTANCE.Parent = game.Players.LocalPlayer:WaitForChild('PlayerGui')
 else
 	warn('[+] ENCRYPT > LOADED IN '..tostring(tick() - start_time):sub(1,4) .. ' SECONDS')
 end
 
 spawn(function()
-	task.wait(0.1)
-	encrypt.on_loaded()
+	task.wait()
+	fireallconnections(encrypt.OnLoaded)
 end)
 
 return encrypt
