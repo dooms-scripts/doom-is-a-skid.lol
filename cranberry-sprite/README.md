@@ -68,7 +68,7 @@ local toggle = category:new_toggle({
 --> creates a keybind
 local keybind = category:new_keybind({
 	text = 'keybind',
-	input_mode = 'click' -- you can set a custom input mode from one of the three: click, hold, toggle
+	input_mode = 'click', -- you can set a custom input mode from one of the three: click, hold, toggle
 	key = 'E',
 	callback = function()
 		warn('keybind input')
