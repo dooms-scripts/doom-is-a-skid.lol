@@ -641,13 +641,17 @@ function encrypt.new_window(...)
 
 				-- Functions
 				function category.append(y)
-					CategoryFrame.Size += UDim2.new(0, 0, 0, y)
-					ContentHolder.CanvasSize += UDim2.new(0, 0, 0, y)
+					task.delay(0.01, function()
+						CategoryFrame.Size += UDim2.new(0, 0, 0, y)
+						ContentHolder.CanvasSize += UDim2.new(0, 0, 0, y)
+					end)
 				end
 
 				function category.cut(y)
-					CategoryFrame.Size -= UDim2.new(0, 0, 0, y)
-					ContentHolder.CanvasSize -= UDim2.new(0, 0, 0, y)
+					task.delay(0.01, function()
+						CategoryFrame.Size -= UDim2.new(0, 0, 0, y)
+						ContentHolder.CanvasSize -= UDim2.new(0, 0, 0, y)
+					end)
 				end
 
 				function category.new_label(...)
