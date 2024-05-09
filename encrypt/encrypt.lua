@@ -1123,6 +1123,7 @@ function encrypt.new_window(...)
 					end
 
 					function keybind:Disconnect()
+						local thread = encrypt.connections[category.keybind_count]
 						thread:Disconnect()
 					end
 
@@ -1790,6 +1791,13 @@ end
 function encrypt:exit()
 	encrypt.instance:Destroy()
 
+	for _, connection in encrypt.connections do
+		pcall(function() 
+			connection:Disconnect() 
+			print('closed 1 keybind connection')
+		end)
+	end
+
 	for _, t in pairs(encrypt.threads) do
 		if pcall(function() coroutine.close(t) end) then print("Closed thread: " .. t) end
 
@@ -1804,10 +1812,6 @@ function encrypt:exit()
 				print('Closed thread: '.. thread)
 			end)
 		end
-	end
-
-	for _, connection in encrypt.connections do
-		pcall(function() connection:Disconnect() end)
 	end
 
 	warn('[-] ENCRYPT > CLOSED')
