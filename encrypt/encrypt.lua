@@ -587,6 +587,7 @@ function encrypt.new_window(...)
 					textbox_count = 0,
 					dropdown_count = 0,
 					colorpicker_count = 0,
+					searchbar_count = 0,
 				}
 
 				local title_text = title_text or 'Category'
@@ -1846,6 +1847,9 @@ function encrypt.new_window(...)
 				end
 				
 				function category.new_searchbar()
+					if category.searchbar_count == 1 then return warn('[!] This category already has a search bar') end
+					category.searchbar_count += 1
+					
 					local container = encrypt.create("Frame", {
 						Parent = CategoryFrame;
 						BorderSizePixel = 0;
