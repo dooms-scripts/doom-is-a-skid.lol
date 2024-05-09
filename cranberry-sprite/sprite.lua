@@ -517,7 +517,7 @@ function library:new_window(...)
 
 					if data.key then
 						keybind.key = data.key
-						keybind_button.Text = string.format('[%s]', keybind.key)
+						keybind_button.Text = string.format('[%s]', data.key)
 					end
 
 					local blacklisted_keys = {
