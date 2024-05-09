@@ -516,8 +516,8 @@ function library:new_window(...)
 					local keybind_button = create("TextButton", {TextStrokeTransparency = 0.5;BorderSizePixel = 0;AutoButtonColor = false;BackgroundColor3 = Color3.fromRGB(255, 255, 255);Parent = toggle_frame;AnchorPoint = Vector2.new(1, 0.5);TextSize = 13;Size = UDim2.new(0, 30, 0, 15);TextXAlignment = Enum.TextXAlignment.Right;BorderColor3 = Color3.fromRGB(0, 0, 0);Text = '[...]';TextStrokeColor3 = Color3.fromRGB(18, 18, 18);Font = Enum.Font.Code;Name = [[keybind_button]];Position = UDim2.new(1, 0, 0.5, 0);TextColor3 = Color3.fromRGB(150, 150, 150);BackgroundTransparency = 1;})
 
 					if data.key then
-						keybind_button.Text = string.format('[%s]', keybind.key)
 						keybind.key = data.key
+						keybind_button.Text = string.format('[%s]', keybind.key)
 					end
 
 					local blacklisted_keys = {
