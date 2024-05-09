@@ -1842,8 +1842,31 @@ function encrypt.new_window(...)
 				function category.import_custom(instance)
 					pcall(function()
 						instance.Parent = CategoryFrame
-						CategoryFrame.Size += UDim2.new(0, 0, instance.Size.Y.Scale, instance.Size.Y.Offset)
+						category.append(instance.Size.Y.Offset)
 					end)
+					
+					local custom_element = {}
+
+					function custom_element:Hide()
+						pcall(function() 
+							instance.Visible = false
+							category.cut(instance.Size.Y.Offset)
+						end)
+					end
+
+					function custom_element:Show()
+						pcall(function()
+							instance.Visible = true
+							category.append(instance.Size.Y.Offset)
+						end)
+					end
+
+					function custom_element:Destroy()
+						pcall(function()
+							instance:Destroy()
+							category.cut(instance.Size.Y.Offset)
+						end)
+					end
 				end
 				
 				function category.new_searchbar()
