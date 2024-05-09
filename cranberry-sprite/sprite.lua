@@ -23,7 +23,7 @@
 
 --[[ LIBRARY DATA ]]-------------------------------------------------
 local library = {
-	version = '1.2.5',
+	version = '1.2.6',
 	use_custom_cursor = true,
 	threads = {}, connections = {},
 	custom_cursor = {
@@ -764,8 +764,8 @@ function library:new_window(...)
 				create("UIPadding", {Parent = keybind_frame;PaddingRight = UDim.new(0, 6);PaddingLeft = UDim.new(0, 6);})
 
 				if data.key then
-					keybind_button.Text = string.format('[%s]', keybind.key)
 					keybind.key = data.key
+					keybind_button.Text = string.format('[%s]', data.key)
 				end
 
 				local blacklisted_keys = {
