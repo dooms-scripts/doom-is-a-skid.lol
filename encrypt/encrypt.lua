@@ -1094,7 +1094,7 @@ function encrypt.new_window(...)
 						print('editing...')
 					end)
 
-					encrypt.connections[category.keybind_count] = input_service.InputBegan:Connect(function(input)
+					encrypt.connections[`keybind{category.keybind_count}`] = input_service.InputBegan:Connect(function(input)
 						local focused = input_service:GetFocusedTextBox()
 						if focused then return end
 
@@ -1107,6 +1107,8 @@ function encrypt.new_window(...)
 							data.callback()
 						end
 					end)
+
+					print('made keybind connection')
 					
 					function keybind:Hide()
 						container.Visible = false
@@ -1123,7 +1125,7 @@ function encrypt.new_window(...)
 					end
 
 					function keybind:Disconnect()
-						local thread = encrypt.connections[category.keybind_count]
+						local thread = encrypt.connections[`keybind{category.keybind_count}`]
 						thread:Disconnect()
 					end
 
@@ -1791,10 +1793,10 @@ end
 function encrypt:exit()
 	encrypt.instance:Destroy()
 
-	for _, connection in encrypt.connections do
+	for index, connection in encrypt.connections do
 		pcall(function() 
 			connection:Disconnect() 
-			print('closed 1 keybind connection')
+			print(`closed: {index}`)
 		end)
 	end
 
