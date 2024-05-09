@@ -54,7 +54,7 @@ local button = category:new_button({
 	text = 'button',
 	callback = function()
 		warn('this is a button!')
-	end)
+	end
 })
 
 --> creates a toggle
@@ -62,7 +62,7 @@ local toggle = category:new_toggle({
 	text = 'toggle',
 	callback = function(value) -- you can either use a predefined variable, or add an argument to the function like seen here.
 		warn('toggle value changed: ' .. tostring(value))
-	end),
+	end,
 })
 
 --> creates a keybind
