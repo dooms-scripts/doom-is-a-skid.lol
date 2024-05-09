@@ -6,7 +6,7 @@
 # HOW TO USE
 > Initializing the library
 ```lua
-local sprite = loadstring(game:HttpGet('https://raw.githubusercontent.com/dooms-scripts/ui-libraries/main/cranberry-sprite/sprite.lua')()
+local sprite = loadstring(game:HttpGet('https://raw.githubusercontent.com/dooms-scripts/ui-libraries/main/cranberry-sprite/sprite.lua'))()
 ```  
 > Library settings
 ```lua
