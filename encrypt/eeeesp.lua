@@ -300,7 +300,8 @@ library.new = function(esp_type : string, player : Player, ... : {})
 		end
 		
 		for _, line in pairs(outlines) do
-			line.Visible = data.Enabled and data.Outline
+			--line.Visible = data.Enabled and data.Outline
+			line.Visible = false
 			line.Color = data.OutlineColor
 			line.Thickness = 3
 		end
