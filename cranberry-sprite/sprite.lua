@@ -234,7 +234,7 @@ function library:new_window(...)
 
 	local window_data = overwrite(data, ... or {})
 
-	local window_frame = create("Frame", {Name = encrypt_name();Parent = library.GUI;Draggable = window_data.draggable;AnchorPoint = window_data.anchor; BorderSizePixel = 0;Size = window_data.size;BorderColor3 = Color3.fromRGB(45, 45, 45);BorderMode = Enum.BorderMode.Inset;Position = window_data.position;BackgroundColor3 = Color3.fromRGB(40, 40, 40);Active=true;Selectable=true;})
+	local window_frame = create("Frame", {Name = encrypt_name();Parent = library.GUI;Draggable = false;AnchorPoint = window_data.anchor; BorderSizePixel = 0;Size = window_data.size;BorderColor3 = Color3.fromRGB(45, 45, 45);BorderMode = Enum.BorderMode.Inset;Position = window_data.position;BackgroundColor3 = Color3.fromRGB(40, 40, 40);Active=true;Selectable=true;})
 	local tab_holder = create("Frame", {Name = encrypt_name();Parent = window_frame;AnchorPoint = Vector2.new(0.5, 1);ZIndex = 2;BorderSizePixel = 0;Size = UDim2.new(1, 0, 1, -45);BorderColor3 = Color3.fromRGB(0, 0, 0);LayoutOrder = 2;Position = UDim2.new(0.5, 0, 1, 0);BackgroundTransparency = 1;BackgroundColor3 = Color3.fromRGB(255, 255, 255);})
 	local top_bar = create("Frame", {Name = encrypt_name();Parent = window_frame;Size = UDim2.new(1, 0, 0, 25);BorderColor3 = Color3.fromRGB(58, 58, 58);BorderMode = Enum.BorderMode.Inset;BackgroundColor3 = Color3.fromRGB(40, 40, 40);})
 	local label = create("TextLabel", {Name = encrypt_name(); Parent = top_bar; TextStrokeTransparency = 0.5;BorderSizePixel = 0;RichText = true;BackgroundColor3 = Color3.fromRGB(255, 255, 255);AnchorPoint = Vector2.new(0.5, 0);TextSize = 14;Size = UDim2.new(1, 0, 1, 0);TextXAlignment = Enum.TextXAlignment.Left;BorderColor3 = Color3.fromRGB(0, 0, 0);Text = string.format(window_data.title);TextStrokeColor3 = Color3.fromRGB(18, 18, 18);Font = Enum.Font.Code;Position = UDim2.new(0.5, 0, 0, 0);TextColor3 = library.colors.accent;BackgroundTransparency = 1;})
@@ -249,6 +249,70 @@ function library:new_window(...)
 	create("UIPadding", {Name = encrypt_name();Parent = tab_buttons;PaddingRight = UDim.new(0, 6);PaddingLeft = UDim.new(0, 6);})
 	create("UIListLayout", {Name = encrypt_name(); FillDirection = Enum.FillDirection.Horizontal;Parent = tab_buttons;Padding = UDim.new(0, 10);SortOrder = Enum.SortOrder.LayoutOrder;})
 	create("UIListLayout", {Name = encrypt_name();Parent = window_frame;SortOrder = Enum.SortOrder.LayoutOrder;})
+
+	--[[
+			Dependancies
+	]]--
+	
+	-- >> Services
+	local Players = game:GetService('Players')
+	local InputService = game:GetService('UserInputService')
+	
+	-- >> Variables
+	local Player = Players.LocalPlayer
+	local Mouse = Player:GetMouse()
+	
+	local Dragging = false;
+	local DragStartPos = nil;
+	local FrameStartPos = nil;
+	local DeltaPosition = nil;
+	
+	-- >> Functions
+	function ValidInput(InputType)
+		if InputType == Enum.UserInputType.MouseButton1 then return true end
+		if InputType == Enum.UserInputType.MouseMovement then return true end
+		if InputType == Enum.UserInputType.Touch then return true end
+	end
+	
+	--[[
+			Connections
+	]]--
+	
+	-- >> Input Began
+	InputService.InputBegan:Connect(function(Input)
+		local InputType = Input.UserInputType
+		
+		if ValidInput(InputType) and Frame.GuiState == Enum.GuiState.Press then
+			DragStartPos = Input.Position
+			FrameStartPos = window_frame.Position
+			Dragging = true
+		end
+		
+		-- >> Input Ended
+		Input.Changed:Connect(function(InputType)
+			local InputState = Input.UserInputState
+			
+			if InputState == Enum.UserInputState.End then
+				Dragging = false
+			end
+		end)
+	end)
+	
+	-- >> Input Changed
+	InputService.InputChanged:Connect(function(Input)
+		local InputType = Input.UserInputType
+	
+		if ValidInput(InputType) then
+			if Dragging then
+				DeltaPosition = Input.Position - DragStartPos
+	
+				window_frame.Position = UDim2.new(
+					FrameStartPos.X.Scale, FrameStartPos.X.Offset + DeltaPosition.X,
+					FrameStartPos.Y.Scale, FrameStartPos.Y.Offset + DeltaPosition.Y
+				)
+			end
+		end
+	end)
 
 	function window:toggle()
 		window_frame.Visible = not window_frame.Visible
