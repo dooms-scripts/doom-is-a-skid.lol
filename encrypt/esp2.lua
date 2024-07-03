@@ -322,7 +322,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 			end
 			
 			for _, line in pairs(outlines) do 
-				line.Visible = true 
+				--line.Visible = true 
 			end
 		end
 		
