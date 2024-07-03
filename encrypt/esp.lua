@@ -409,7 +409,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 	
 	--// SKELETONS \\---------------------------------------------------
 	if esp_type == 'Skeleton' then
-		local skeleton, defaults, connections = { i = #drawings.skeletons+1 }, { -- <table>
+		local skeleton, defaults, connections = { i = #library.drawings.skeletons+1 }, { -- <table>
 			Enabled = true,
 			Color = Color3.fromRGB(255, 255, 255), -- <color3>
 			Thickness = 1, -- <number>
