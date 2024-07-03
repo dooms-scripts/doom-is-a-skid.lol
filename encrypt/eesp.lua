@@ -286,7 +286,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 			[4] = Drawing.new('Line'),
 		}
 
-		task.wait()
+		task.wait(1)
 		local outlines = {
 			[1] = Drawing.new('Line'),
 			[2] = Drawing.new('Line'),
