@@ -282,7 +282,7 @@ function library:new_window(...)
 	InputService.InputBegan:Connect(function(Input)
 		local InputType = Input.UserInputType
 		
-		if ValidInput(InputType) and Frame.GuiState == Enum.GuiState.Press then
+		if ValidInput(InputType) and window_frame.GuiState == Enum.GuiState.Press then
 			DragStartPos = Input.Position
 			FrameStartPos = window_frame.Position
 			Dragging = true
