@@ -285,7 +285,8 @@ library.new = function(esp_type : string, player : Player, ... : {})
 			[3] = Drawing.new('Line'),
 			[4] = Drawing.new('Line'),
 		}
-		
+
+		task.wait()
 		local outlines = {
 			[1] = Drawing.new('Line'),
 			[2] = Drawing.new('Line'),
@@ -302,6 +303,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 			line.Visible = data.Outline
 			line.Visible = data.Enabled
 			line.Color = data.OutlineColor
+			line.Thickness = 3
 		end
 		
 		function box:Hide()
