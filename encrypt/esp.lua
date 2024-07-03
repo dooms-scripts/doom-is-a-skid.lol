@@ -337,7 +337,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 
 			for _, line in pairs(outlines) do
 				line.Visible = data.Outline
-				line.Visible = data.Enabled
+				--line.Visible = data.Enabled
 				line.Color = data.OutlineColor
 			end
 		end
