@@ -279,15 +279,15 @@ library.new = function(esp_type : string, player : Player, ... : {})
 
 		local data = overwrite(defaults, ... or {})
 		
-		local lines = {
+		local outlines = {
 			[1] = Drawing.new('Line'),
 			[2] = Drawing.new('Line'),
 			[3] = Drawing.new('Line'),
 			[4] = Drawing.new('Line'),
 		}
 
-		task.wait(1)
-		local outlines = {
+		task.wait()
+		local lines = {
 			[1] = Drawing.new('Line'),
 			[2] = Drawing.new('Line'),
 			[3] = Drawing.new('Line'),
