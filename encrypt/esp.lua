@@ -434,6 +434,13 @@ library.new = function(esp_type : string, player : Player, ... : {})
 
 			return drawing
 		end
+
+		--> Draw head
+		local HeadCircle = Drawing.new('Circle')
+		HeadCircle.Color = Color3.fromRGB(255, 255, 255)
+		HeadCircle.Visible = true
+		HeadCircle.Thickness = 1
+		HeadCircle.Radius = 5
 		
 		--> Draw Adornment
 		local line_adornment = Instance.new('LineHandleAdornment')
@@ -475,12 +482,16 @@ library.new = function(esp_type : string, player : Player, ... : {})
 			for _, line in pairs(lines) do
 				line.Visible = false
 			end
+
+			HeadCircle.Visible = false
 		end
 		
 		function skeleton:Show()
 			for _, line in pairs(lines) do
 				line.Visible = true
 			end
+			
+			HeadCircle.Visible = false
 		end
 		
 		function skeleton:Update(...)
@@ -496,6 +507,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 		
 		function skeleton:Destroy()
 			line_adornment:Destroy()
+			HeadCircle:Remove()
 			
 			for _, line in pairs(lines) do
 				line:Remove()
@@ -514,8 +526,15 @@ library.new = function(esp_type : string, player : Player, ... : {})
 					line_adornment.Parent = char.UpperTorso
 					line_adornment.Adornee = char.UpperTorso
 
+					local camera = workspace.CurrentCamera
 					local root = char.HumanoidRootPart or char:WaitForChild('HumanoidRootPart')
-					local _, on_screen = workspace.CurrentCamera:WorldToViewportPoint(root.Position)
+					local _, on_screen = camera:WorldToViewportPoint(root.Position)
+					
+					local DistanceToSubject = (camera.CFrame.Position - root.Position).Magnitude
+					local DepthPerceptionSize = (250 / DistanceToSubject)
+					
+					HeadCircle.Visible = on_screen
+					HeadCircle.Radius = DepthPerceptionSize
 
 					--> Get Attachments
 					local attachments = {
@@ -549,8 +568,12 @@ library.new = function(esp_type : string, player : Player, ... : {})
 					
 					if on_screen and data.Enabled then
 						--> Head <-------------------------------------------------------------
-						lines.Head.From = getWorldVector2(attachments.Neck)
-						lines.Head.To = getWorldVector2(attachments.Head)
+						local HeadVector, _ = camera:WorldToViewportPoint(char.Head.Position)
+						local HeadVector2 = Vector2.new(Vector.X, Vector.Y)
+						HeadCircle.Position = HeadVector
+								
+						-- lines.Head.From = getWorldVector2(attachments.Neck)
+						-- lines.Head.To = getWorldVector2(attachments.Head)
 
 						lines.Waist.From = getWorldVector2(attachments.Neck)
 						lines.Waist.To = getWorldVector2(attachments.Waist)
