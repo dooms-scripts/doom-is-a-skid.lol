@@ -570,7 +570,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 						--> Head <-------------------------------------------------------------
 						local HeadVector, _ = camera:WorldToViewportPoint(char.Head.Position)
 						local HeadVector2 = Vector2.new(HeadVector.X, HeadVector.Y)
-						HeadCircle.Position = HeadVector
+						HeadCircle.Position = HeadVector2
 
 						-- lines.Head.From = getWorldVector2(attachments.Neck)
 						-- lines.Head.To = getWorldVector2(attachments.Head)
