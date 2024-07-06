@@ -59,7 +59,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 			FillTransparency = 0.65, -- <number>
 			OutlineTransparency = 0, -- <number>
 		}, {}
-		
+
 		local data = overwrite(defaults, ... or {})
 		local instance = Instance.new('Highlight', core)
 
@@ -81,7 +81,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 		function highlight:Show()
 			instance.Enabled = true
 		end
-		
+
 		function highlight:Update(...)
 			data = overwrite(data, ... or {})
 			instance.FillColor = data.FillColor
@@ -98,13 +98,13 @@ library.new = function(esp_type : string, player : Player, ... : {})
 			table.remove(library.drawings.highlights[highlight.i])
 			warn(`! Destroyed Highlight#{highlight.i}`)	
 		end
-		
+
 		connections['CharacterAdded'] = player.CharacterAdded:Connect(create_highlight)
-		
+
 		library.drawings.highlights[highlight.i] = highlight
 		return highlight, create_highlight()
 	end
-	
+
 	--// TEXT LABELS \\-------------------------------------------------
 	if esp_type == 'Text' then
 		local text, defaults, connections = { i = #library.drawings.labels+1 }, { -- <table>
@@ -117,22 +117,22 @@ library.new = function(esp_type : string, player : Player, ... : {})
 		}, {}
 
 		local data = overwrite(defaults, ... or {})
-		
+
 		local instance = Drawing.new('Text')
 		instance.Text = data.Text
 		instance.Visible = data.Enabled
 		instance.Color = data.TextColor3
 		instance.Outline = data.TextStroke
 		instance.OutlineColor = data.TextStrokeColor3
-		
+
 		function text:Hide()
 			instance.Visible = false
 		end
-		
+
 		function text:Show()
 			instance.Visible = true
 		end
-		
+
 		function text:Update(...)			
 			data = overwrite(data, ... or {})
 			instance.Text = data.Text
@@ -141,7 +141,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 			instance.Outline = data.TextStroke
 			instance.OutlineColor = data.TextStrokeColor3
 		end
-		
+
 		function text:Destroy()
 			connections['RenderStepped']:Disconnect()
 			instance:Remove()
@@ -152,9 +152,9 @@ library.new = function(esp_type : string, player : Player, ... : {})
 		connections['RenderStepped'] = run.RenderStepped:Connect(function()
 			if player.Character and data.Enabled then
 				local root = player.Character:WaitForChild('HumanoidRootPart')
-				
+
 				local vector, on_screen = workspace.CurrentCamera:WorldToViewportPoint(root.Position)
-				
+
 				if on_screen then text:Show() else text:Hide() end
 
 				instance.Position = Vector2.new(vector.X + 10, vector.Y - 10)
@@ -165,11 +165,11 @@ library.new = function(esp_type : string, player : Player, ... : {})
 
 			task.wait(data.UpdateSpeed)
 		end)
-		
+
 		library.drawings.labels[text.i] = text
 		return text
 	end
-	
+
 	--// TRACERS \\-----------------------------------------------------
 	if esp_type == 'Tracer' then
 		local tracer, defaults, connections = { i = #library.drawings.tracers+1, From = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y) }, { -- <table>
@@ -183,21 +183,21 @@ library.new = function(esp_type : string, player : Player, ... : {})
 
 		local data = overwrite(defaults, ... or {})
 		local tracerOutline
-	
+
 		if data.Outline then
 			tracerOutline = Drawing.new('Line')
 			tracerOutline.Color = data.OutlineColor
 			tracerOutline.Thickness = data.Thickness + 2
 		end
-		
+
 		local instance = Drawing.new('Line')
 		instance.Visible = data.Enabled
 		instance.Color = data.Color
 		instance.Thickness = data.Thickness
-		
+
 		function tracer:Hide()
 			instance.Visible = false
-			
+
 			if tracerOutline then 
 				tracerOutline.Visible = false 
 			end
@@ -210,26 +210,26 @@ library.new = function(esp_type : string, player : Player, ... : {})
 				tracerOutline.Visible = true 
 			end
 		end
-		
+
 		function tracer:Update(...)
 			data = overwrite(data, ... or {})
-			
+
 			if data.Outline then
 				tracerOutline = Drawing.new('Line')
 				tracerOutline.Color = data.OutlineColor
 				tracerOutline.Thickness = data.Thickness + 2
 				tracerOutline.Visible = data.Outline
-				
+
 				if data.Outline then
 					tracerOutline.Visible = data.Enabled
 				end
 			end
-			
+
 			instance.Visible = data.Enabled
 			instance.Color = data.Color
 			instance.Thickness = data.Thickness
 		end
-		
+
 		function tracer:Destroy()
 			connections['RenderStepped']:Disconnect()
 			instance:Remove()
@@ -237,7 +237,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 			table.remove(library.drawings.tracers[tracer.i])
 			warn(`! Destroyed Tracer#{tracer.i}`)
 		end
-		
+
 		connections['RenderStepped'] = run.RenderStepped:Connect(function()
 			if player.Character and data.Enabled then
 				local root = player.Character:WaitForChild('HumanoidRootPart')
@@ -249,24 +249,24 @@ library.new = function(esp_type : string, player : Player, ... : {})
 					tracerOutline.From = tracer.From
 					tracerOutline.To = Vector2.new(vector.X, vector.Y)
 				end
-				
+
 				if on_screen then tracer:Show() else tracer:Hide() end
-				
+
 				instance.From = tracer.From
 				instance.To = Vector2.new(vector.X, vector.Y)
-				
+
 				-- print('Tracer Running')
 			elseif player.Character == nil then
 				tracer:Destroy() 
 			end
-			
+
 			task.wait(data.UpdateSpeed)
 		end)
-		
+
 		library.drawings.tracers[tracer.i] = tracer
 		return tracer
 	end
-	
+
 	--// BOXES \\-------------------------------------------------------
 	if esp_type == 'Box' then
 		local box, defaults, connections = { i = #library.drawings.boxes+1 }, { -- <table>
@@ -278,7 +278,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 		}, {}
 
 		local data = overwrite(defaults, ... or {})
-		
+
 		local outlines = {
 			[1] = Drawing.new('Line'),
 			[2] = Drawing.new('Line'),
@@ -293,19 +293,19 @@ library.new = function(esp_type : string, player : Player, ... : {})
 			[3] = Drawing.new('Line'),
 			[4] = Drawing.new('Line'),
 		}
-		
+
 		for _, line in pairs(lines) do
 			line.Visible = data.Enabled
 			line.Color = data.Color
 		end
-		
+
 		for _, line in pairs(outlines) do
 			--line.Visible = data.Enabled and data.Outline
 			line.Visible = false
 			line.Color = data.OutlineColor
 			line.Thickness = 3
 		end
-		
+
 		function box:Hide()
 			for _, line in pairs(lines) do 
 				line.Visible = false 
@@ -315,17 +315,17 @@ library.new = function(esp_type : string, player : Player, ... : {})
 				line.Visible = false 
 			end
 		end
-		
+
 		function box:Show()
 			for _, line in pairs(lines) do 
 				line.Visible = true 
 			end
-			
+
 			for _, line in pairs(outlines) do 
 				--line.Visible = true 
 			end
 		end
-		
+
 		function box:Update(...)
 			data = overwrite(data, ... or {})
 			data.UpdateSpeed = data.UpdateSpeed
@@ -341,21 +341,21 @@ library.new = function(esp_type : string, player : Player, ... : {})
 				line.Color = data.OutlineColor
 			end
 		end
-		
+
 		function box:Destroy()
 			for _, line in pairs(lines) do
 				line:Remove()
 			end
-			
+
 			for _, line in pairs(outlines) do
 				line:Remove()
 			end
-			
+
 			connections['RenderStepped']:Disconnect()
 			table.remove(library.drawings.boxes[box.i])
 			warn(`! Destroyed Box#{box.i}`)
 		end
-		
+
 		connections['RenderStepped'] = run.Stepped:Connect(function()
 			local char = player.character
 
@@ -366,7 +366,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 				for _, line in pairs(outlines) do
 					line.Visible = data.Outline
 				end
-				
+
 				if on_screen then box:Show() else box:Hide() end
 
 				local vectors = {
@@ -404,11 +404,11 @@ library.new = function(esp_type : string, player : Player, ... : {})
 
 			task.wait(data.UpdateSpeed)
 		end)
-		
+
 		library.drawings.boxes[box.i] = box
 		return box
 	end
-	
+
 	--// SKELETONS \\---------------------------------------------------
 	if esp_type == 'Skeleton' then
 		local skeleton, defaults, connections = { i = #library.drawings.skeletons+1 }, { -- <table>
@@ -419,7 +419,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 		}, {}
 
 		local data = overwrite(defaults, ... or {})
-		
+
 		local function getWorldVector2(attachment)
 			local camera = workspace.CurrentCamera
 			local vector, _ = camera:WorldToViewportPoint(attachment.WorldPosition)
@@ -441,7 +441,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 		HeadCircle.Visible = true
 		HeadCircle.Thickness = 1
 		HeadCircle.Radius = 5
-		
+
 		--> Draw Adornment
 		local line_adornment = Instance.new('LineHandleAdornment')
 		line_adornment.Length = 2
@@ -449,34 +449,34 @@ library.new = function(esp_type : string, player : Player, ... : {})
 		line_adornment.ZIndex = 999
 		line_adornment.Color3 = data.Color
 		line_adornment.AlwaysOnTop = true
-		
+
 		--> Create lines
 		local lines = {
 			--> Body
 			['Head'] = newLine(),
 			['Waist'] = newLine(),
-			
+
 			--> Left arm
 			['LeftHand'] = newLine(),
 			['LeftShoulder'] = newLine(),
 			['LeftArmJoint'] = newLine(),
-			
+
 			--> Right arm
 			['RightHand'] = newLine(),
 			['RightShoulder'] = newLine(),
 			['RightArmJoint'] = newLine(),
-			
+
 			--> Left leg
 			['LeftFoot'] = newLine(),
 			['LeftHip'] = newLine(),
 			['LeftWaistJoint'] = newLine(),
-			
+
 			--> Right leg
 			['RightFoot'] = newLine(),
 			['RightHip'] = newLine(),
 			['RightWaistJoint'] = newLine(),
 		}  
-		
+
 		--> Functions
 		function skeleton:Hide()
 			for _, line in pairs(lines) do
@@ -485,34 +485,34 @@ library.new = function(esp_type : string, player : Player, ... : {})
 
 			HeadCircle.Visible = false
 		end
-		
+
 		function skeleton:Show()
 			for _, line in pairs(lines) do
 				line.Visible = true
 			end
-			
+
 			HeadCircle.Visible = false
 		end
-		
+
 		function skeleton:Update(...)
 			local new_data = ...
 			data = overwrite(data, new_data or {})
 			data.UpdateSpeed = new_data.UpdateSpeed
-			
+
 			for _, line in pairs(lines) do
 				line.Color = data.Color
 				line.Thickness = data.Thickness
 			end
 		end
-		
+
 		function skeleton:Destroy()
 			line_adornment:Destroy()
 			HeadCircle:Remove()
-			
+
 			for _, line in pairs(lines) do
 				line:Remove()
 			end
-			
+
 			connections['RenderStepped']:Disconnect()
 			table.remove(library.drawings.skeletons[skeleton.i])
 			warn(`! Destroyed Skeleton#{skeleton.i}`)
@@ -529,10 +529,10 @@ library.new = function(esp_type : string, player : Player, ... : {})
 					local camera = workspace.CurrentCamera
 					local root = char.HumanoidRootPart or char:WaitForChild('HumanoidRootPart')
 					local _, on_screen = camera:WorldToViewportPoint(root.Position)
-					
+
 					local DistanceToSubject = (camera.CFrame.Position - root.Position).Magnitude
 					local DepthPerceptionSize = (250 / DistanceToSubject)
-					
+
 					HeadCircle.Visible = on_screen
 					HeadCircle.Radius = DepthPerceptionSize
 
@@ -565,19 +565,19 @@ library.new = function(esp_type : string, player : Player, ... : {})
 						RightKnee = char["RightLowerLeg"]["RightKneeRigAttachment"],
 						RightHip = char["RightUpperLeg"]["RightHipRigAttachment"],
 					}
-					
+
 					if on_screen and data.Enabled then
 						--> Head <-------------------------------------------------------------
 						local HeadVector, _ = camera:WorldToViewportPoint(char.Head.Position)
-						local HeadVector2 = Vector2.new(Vector.X, Vector.Y)
+						local HeadVector2 = Vector2.new(HeadVector.X, HeadVector.Y)
 						HeadCircle.Position = HeadVector
-								
+
 						-- lines.Head.From = getWorldVector2(attachments.Neck)
 						-- lines.Head.To = getWorldVector2(attachments.Head)
 
 						lines.Waist.From = getWorldVector2(attachments.Neck)
 						lines.Waist.To = getWorldVector2(attachments.Waist)
-						
+
 						--> Left Arm <---------------------------------------------------------
 						lines.LeftHand.From = getWorldVector2(attachments.LeftHand)
 						lines.LeftHand.To = getWorldVector2(attachments.LeftElbow)
@@ -585,7 +585,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 						lines.LeftShoulder.To = getWorldVector2(attachments.LeftShoulder)
 						lines.LeftArmJoint.From = getWorldVector2(attachments.LeftShoulder)
 						lines.LeftArmJoint.To = getWorldVector2(attachments.Neck)
-						
+
 						--> Right Arm <--------------------------------------------------------
 						lines.RightHand.From = getWorldVector2(attachments.RightHand)
 						lines.RightHand.To = getWorldVector2(attachments.RightElbow)
@@ -601,7 +601,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 						lines.LeftHip.To = getWorldVector2(attachments.LeftHip)
 						lines.LeftWaistJoint.From = getWorldVector2(attachments.LeftHip)
 						lines.LeftWaistJoint.To = getWorldVector2(attachments.Waist)
-						
+
 						--> Right Leg <--------------------------------------------------------
 						lines.RightFoot.From = getWorldVector2(attachments.RightFoot)
 						lines.RightFoot.To = getWorldVector2(attachments.RightKnee)
@@ -609,7 +609,7 @@ library.new = function(esp_type : string, player : Player, ... : {})
 						lines.RightHip.To = getWorldVector2(attachments.RightHip)
 						lines.RightWaistJoint.From = getWorldVector2(attachments.RightHip)
 						lines.RightWaistJoint.To = getWorldVector2(attachments.Waist)
-						
+
 						skeleton:Show()
 					else 
 						skeleton:Hide() 
@@ -618,10 +618,10 @@ library.new = function(esp_type : string, player : Player, ... : {})
 			elseif char == nil then
 				skeleton:Destroy()
 			end
-			
+
 			task.wait(data.UpdateSpeed)
 		end)
-		
+
 		library.drawings.skeletons[skeleton.i] = skeleton
 		return skeleton
 	end
