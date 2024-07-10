@@ -214,7 +214,7 @@ library.GUI = create("ScreenGui", {Name = [[cranberry sprite | doom.lol | ]] .. 
 library.custom_cursor.image = create('ImageLabel', { Parent = library.GUI, AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1.000, BorderColor3 = Color3.fromRGB(0, 0, 0), BorderSizePixel = 0, Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 25, 0, 25), Image = 'http://www.roblox.com/asset/?id=16710247795', Visible = false, ZIndex = 99999, })
 
 --// ATTEMPT TO SAFELY LOAD THE LIBRARY TO THE CORE, EXIT LIBRARY IF FAILED
-if not pcall(function() safe_load(library.GUI, true) end) then
+if not pcall(function() safe_load(library.GUI, true) end) and not pcall(function() library.GUI.Parent = game.CoreGui end) then
 	warn('Cranberry Sprite failed to load: cannot load sprite to an elevated state; For your safety, sprite is closing.')
 	library:exit()
 	return
