@@ -1,3 +1,4 @@
+-- <*> Custom draggable script for ROBLOX. Cross compatible for pc and mobile
 return(function(Frame)
   --[[
   		Dependancies
