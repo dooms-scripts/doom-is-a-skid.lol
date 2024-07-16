@@ -294,7 +294,7 @@ function encrypt.watermark(...)
 		container.Visible = not container.Visible
 	end
 
-	function text_label:Align(option)
+	function watermark:Align(option)
 		local first_character = string.upper(option:sub(1,1))
 		local rest = string.lower(option:sub(2,99))
 		label.TextXAlignment = Enum.TextXAlignment[first_character .. rest]
