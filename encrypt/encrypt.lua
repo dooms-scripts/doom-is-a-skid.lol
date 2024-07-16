@@ -259,7 +259,7 @@ function encrypt.watermark(...)
 		BackgroundTransparency = 1.000,
 		BorderColor3 = Color3.fromRGB(0, 0, 0),
 		BorderSizePixel = 0,
-		Size = UDim2.new(0, 1, 1, 0),
+		Size = UDim2.new(1, 0, 1, 0),
 		Font = Enum.Font.Gotham,
 		Text = "  ".. data.text,
 		TextColor3 = Color3.fromRGB(255, 255, 255),
