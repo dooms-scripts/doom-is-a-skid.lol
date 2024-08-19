@@ -142,7 +142,7 @@ function Blue.win(a1)
 				ToggleButton.BackgroundTransparency = Toggle.v and 0 or 0.55
 				
 				if data.callback then
-					data.callback()
+					data.callback(Toggle.v)
 				end
 			end)
 			
