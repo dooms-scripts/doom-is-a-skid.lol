@@ -1,6 +1,6 @@
 --* Dependancies
 local Blue = { i = nil }
--- local load_to_core = loadstring(game:HttpGet('https://www.doom-is-a-skid.lol/coreload.lua'))()
+local load_to_core = loadstring(game:HttpGet('https://www.doom-is-a-skid.lol/coreload.lua'))()
 
 --* Module funcs
 function Blue.make(class : string, properties : {})
@@ -29,8 +29,8 @@ end
 
 function Blue.ini()
 	Blue.i = Instance.new('ScreenGui')
-	Blue.i.Parent = game.Players.LocalPlayer.PlayerGui
-	--load_to_core(Blue.i, true)
+	--Blue.i.Parent = game.Players.LocalPlayer.PlayerGui
+	load_to_core(Blue.i, true)
 end
 
 function Blue.exit()
