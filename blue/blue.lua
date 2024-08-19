@@ -140,6 +140,10 @@ function Blue.win(a1)
 			ToggleButton.MouseButton1Click:Connect(function()
 				Toggle.v = not Toggle.v
 				ToggleButton.BackgroundTransparency = Toggle.v and 0 or 0.55
+				
+				if data.callback then
+					data.callback()
+				end
 			end)
 			
 			Win.res(25)
