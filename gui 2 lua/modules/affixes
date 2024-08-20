@@ -1,0 +1,13 @@
+local Affixes = { 
+	['string'] = { PREFIX = '[[', SUFFIX = ']]' },
+	['Rect'] = { PREFIX = 'Rect.new(', SUFFIX = ')' },
+	['UDim'] = { PREFIX = 'UDim.new(', SUFFIX = ')' },
+	['UDim2'] = { PREFIX = 'UDim2.new(', SUFFIX = ')' },
+	['Vector'] = { PREFIX = 'Vector.new(', SUFFIX = ')' },
+	['Vector2'] = { PREFIX = 'Vector2.new(', SUFFIX = ')' },
+	['Color3'] = { PREFIX = 'Color3.fromRGB(', SUFFIX = ')' },
+	['ColorSequence'] = { PREFIX = 'ColorSequence.new({', SUFFIX = '})' },
+	['NumberSequence'] = { PREFIX = 'NumberSequence.new({', SUFFIX = '})' },
+}
+
+return Affixes
