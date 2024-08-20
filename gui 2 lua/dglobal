@@ -1,0 +1,4 @@
+--# Plugin data
+if not _G.DGLOBAL then
+	_G.DGLOBAL = { CREATOR_ID = 157406244 }
+end
