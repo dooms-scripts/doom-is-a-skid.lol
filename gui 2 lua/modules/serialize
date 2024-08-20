@@ -1,0 +1,261 @@
+repeat task.wait() until _G.DGLOBAL
+
+local SerializeModule = {}
+local PluginSettings;
+
+local Modules = script.Parent
+local PropertiesModule = require(Modules:WaitForChild('Properties'))
+local NotifyModule = require(Modules:WaitForChild('Notify'))
+local Affixes = require(Modules:WaitForChild('Affixes'))
+
+if _G.DGLOBAL and _G.DGLOBAL.UI_CONVERTER then
+	-- print('Found DGLOBAL')
+	PluginSettings = _G.DGLOBAL.UI_CONVERTER.SETTINGS
+end
+
+function SerializeModule.GetFullPath(instance : Instance)
+	return `game.{instance.Parent:GetFullName()}`
+end
+
+function SerializeModule.Serialize(instance : Instance, parameters : {})
+	assert(_G.DGLOBAL.UI_CONVERTER.PROCESS, 'Could not find process.')
+	
+	--# Config
+	local PROCESS = _G.DGLOBAL.UI_CONVERTER.PROCESS
+	local SHORTEN_VARIABLES = PluginSettings.SHORTEN_VARIABLES
+	local CONVERSION_METHOD = PluginSettings.CONVERSION_METHOD
+	local FUNCTION_NAME = PluginSettings.FUNCTION_NAME
+	local TABLE_NAME = PluginSettings.TABLE_NAME
+	local USE_TABLE = PluginSettings.USE_TABLE
+	local USE_LOCAL = PluginSettings.USE_LOCAL
+	local NEWLINES = PluginSettings.NEWLINES
+	local COMMENTS = PluginSettings.COMMENTS
+	
+	--# Variables
+	local Chunk;
+	local Properties = PropertiesModule[instance.ClassName] or nil
+
+	if Properties == nil then 
+		return NotifyModule.Notify('Error', 'Failed: Unsupported class!')
+	end
+	
+	--# CName & Variable Shortening
+	local instanceName = SHORTEN_VARIABLES and instance.ClassName:gsub('%l', '') or instance.Name
+	instance:SetAttribute('DGLOBAL_CNAME', SHORTEN_VARIABLES and instance.ClassName:gsub('%l', '') or instance.Name)
+	
+	if getfenv()[instanceName] then
+		instance:SetAttribute('DGLOBAL_CNAME', '_' ..instance:GetAttribute('DGLOBAL_CNAME') or instance.Name)
+	end
+	
+	--# Write FakeScripts table if it doesn't exist
+	if not PROCESS.SCRIPTS then
+		PROCESS.SCRIPTS = {}
+	end
+	
+	--# Write count if it doesn't exist
+	if PROCESS.COUNTS then
+		if PROCESS.COUNTS[instanceName] then
+			PROCESS.COUNTS[instanceName] += 1
+		else
+			PROCESS.COUNTS[instanceName] = 1       
+		end
+	else
+		PROCESS.COUNTS = { 
+			TOTAL = 0, 
+			FAILURES = 0 
+		}
+	end
+	
+	--# Assign cIndex
+	local cIndex = PROCESS.COUNTS[instanceName]
+	if cIndex <= 1 then 
+		cIndex = '' 
+	else
+		instance:SetAttribute('DGLOBAL_COUNT', PROCESS.COUNTS[instanceName])
+	end
+	
+	--# Functions
+	local function Serialize(instance : Instance, Property : string, DefaultValue : any)		
+		local Prefix = ''
+		local Suffix = ''
+		local Overwrite
+		local PropertyOverwrite
+		
+		--# Exclude default values
+		if instance[Property] ~= DefaultValue then
+			--[[	  PREFIX + SUFFIX		]]--
+			for Type, Table in Affixes do
+				Prefix = typeof(instance[Property]) == Type and Table.PREFIX or Prefix
+				Suffix = typeof(instance[Property]) == Type and Table.SUFFIX or Suffix
+			end
+			
+			--[[		OVERWRITES			]]--
+			
+			--! Overwrite Color3
+			if typeof(instance[Property]) == 'Color3' then
+				Overwrite = `{math.floor(instance[Property].R*255)}, {math.floor(instance[Property].G*255)}, {math.floor(instance[Property].B*255)}`
+			end
+			
+			--! Overwrite UDim
+			if typeof(instance[Property]) == 'UDim' or typeof(instance[Property]) == 'UDim2' then
+				Overwrite = tostring(instance[Property]):gsub('[{}]', "")
+			end
+			
+			--! Overwrite EnumItem
+			if typeof(instance[Property]) == 'EnumItem' and instance[Property] == Enum.Font.Unknown then
+				local FontName = instance.FontFace.Family
+				FontName = FontName:gsub(".+/([^/]+)%.json$", "%1")
+				FontName = FontName:gsub('rbxassetid://', '')
+				
+				--Overwrite = `Font.new('{PROCESS.FONTS[FontName]}')`--, {instance.FontFace.Weight}, {instance.FontFace.Style})`
+				if instance.Font.Value == 100 then
+					PropertyOverwrite = 'FontFace'
+					Overwrite = `Font.new('{PROCESS.FONTS[FontName]}', {instance.FontFace.Weight}, {instance.FontFace.Style})`
+				else
+					Overwrite = instance.Font.Value
+				end
+			end
+			
+			--! Overwrite Parent
+			if Property == 'Parent' then
+				local iParent = instance.Parent
+
+				-- Overwrite = SerializeModule.GetFullPath(instance)
+				Overwrite = `{USE_TABLE and TABLE_NAME}.{iParent.Name}`
+
+				local Count = iParent:GetAttribute('DGLOBAL_COUNT') or ''
+				local Cname = iParent:GetAttribute('DGLOBAL_CNAME') or iParent.Name
+				Overwrite = USE_TABLE and `{TABLE_NAME}.{Cname}{Count}` or `{Cname}{Count}`
+				
+				if instance:GetAttribute('DGLOBAL_ANCESTOR') == true then
+					Overwrite = SerializeModule.GetFullPath(instance)
+				end
+
+				if iParent.Parent == game then
+					Overwrite = `game.{iParent.Name}`
+				end
+				
+				if iParent.Name == 'StarterGui' then
+					Overwrite = `game:GetService("Players").LocalPlayer:WaitForChild('PlayerGui')`
+				end
+			end
+			
+			--! Overwrite ColorSequence
+			if typeof(instance[Property]) == 'ColorSequence' then
+				local Keypoints = '';
+
+				--! Get Keypoints
+				for _, Keypoint in ipairs(instance[Property].Keypoints) do
+					--! Get Keypoint Values
+					local KeypointTime = Keypoint.Time
+					local KeypointValue = Keypoint.Value
+					local KeypointString = `Color3.fromRGB({KeypointValue.R * 255}, {KeypointValue.G * 255}, {KeypointValue.B * 255})`
+
+					--! Serialize Keypoint
+					Keypoints = string.format(
+						Keypoints .. `{NEWLINES and '\n	' or ' '}ColorSequenceKeypoint.new(%s, %s);`, 
+						KeypointTime, 
+						KeypointString
+					)
+				end
+
+				--! Overwrite
+				Overwrite = Keypoints
+			end
+
+			--! Overwrite NumberSequence
+			if typeof(instance[Property]) == 'NumberSequence' then
+				local Keypoints = '';
+
+				--! Get Keypoints
+				for _, Keypoint in ipairs(instance[Property].Keypoints) do
+					--! Get Keypoint Values
+					local KeypointTime = Keypoint.Time
+					local KeypointValue = Keypoint.Value
+					local KeypointEnvelope = Keypoint.Envelope
+
+					--! Serialize Keypoint
+					Keypoints = string.format(
+						Keypoints .. `{NEWLINES and '\n	' or ' '}NumberSequenceKeypoint.new(%s, %s, %s);`, 
+						KeypointTime,
+						KeypointValue,
+						KeypointEnvelope
+					)
+				end
+
+				--! Overwrite
+				Overwrite = Keypoints
+			end
+
+			--# Write new line
+			Chunk = string.format(Chunk..`{NEWLINES and '\n' or ' '}{PropertyOverwrite or Property} = {Prefix}{Overwrite or tostring(instance[Property])}{Suffix},`)
+		end
+	end
+	
+	--# Make comment and var lines
+	local VarName = `{SHORTEN_VARIABLES and instance.ClassName:gsub('%l', '') or instance:GetAttribute('DGLOBAL_CNAME') or instance.Name}{cIndex or ''}`
+	
+	if string.match(instance.ClassName, 'Script') then
+		VarName = `FakeScript{cIndex or ''}` 
+	end
+	
+	if getfenv()[VarName] then
+		VarName = '_' .. VarName
+	end
+	
+	Chunk = string.format(COMMENTS and `\n\n--# {instance.Parent.Name}.{instance.Name} \n` or '' .. '\n')
+	Chunk = Chunk..`{NEWLINES and '' or ''}{USE_LOCAL and 'local ' or '' and USE_TABLE and TABLE_NAME..'.' or ''}{VarName} = `
+	
+	--# Make creation lines
+	if CONVERSION_METHOD == 'Normal' then	
+		Chunk = Chunk..`Instance.new("{instance.ClassName}"`
+	elseif CONVERSION_METHOD == 'Custom' then
+		Chunk = string.format(Chunk..`{FUNCTION_NAME}("{instance.ClassName}", \{`)
+	end
+	
+	--# Make property lines
+	local wroteChunk, failureMessage = pcall(function()
+		--! Prioritize "Parent" property first
+		for Property, DefaultValue in pairs(Properties) do
+			if Property == 'Parent' then
+				Serialize(instance, Property, DefaultValue)
+			end
+		end
+		
+		--! Prioritize "Name" property second
+		for Property, DefaultValue in pairs(Properties) do
+			if Property == 'Name' then
+				Serialize(instance, Property, DefaultValue)
+			end
+		end
+		
+		--! Everything else		
+		for Property, DefaultValue in pairs(Properties) do
+			if Property ~= 'Parent' and Property ~= 'Name' then
+				Serialize(instance, Property, DefaultValue)
+			end
+		end
+
+		--# Add parenthesis to the end	
+		Chunk = CONVERSION_METHOD == 'Normal' and string.format(`{Chunk}{NEWLINES and '\n)' or ')'}`) or string.format(`{Chunk}{NEWLINES and '\n})' or '})'}`)
+		--if CONVERSION_METHOD == 'Normal' then
+		--	Chunk = string.format(`{Chunk}{NEWLINES and '\n)' or ')'}`)
+		--elseif CONVERSION_METHOD == 'Custom' then
+		--	Chunk = string.format(`{Chunk}{NEWLINES and '\n})' or '})'}`)
+		--	--Chunk = Chunk .. '})'
+		--end
+	end)
+	
+	PROCESS.COUNTS.TOTAL += 1
+	
+	if wroteChunk then
+		
+	elseif not wroteChunk then
+		PROCESS.COUNTS.FAILURES += 1
+		error(`<!> FAILED TO WRITE INSTANCE: "{instance.Name}". REASON: {failureMessage}`) 
+	end
+	
+	return Chunk, VarName
+end
+
+return SerializeModule
