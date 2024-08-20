@@ -2,3 +2,43 @@
 if not _G.DGLOBAL then
 	_G.DGLOBAL = { CREATOR_ID = 157406244 }
 end
+
+_G.DGLOBAL.UI_CONVERTER = {
+		MODULES = { 
+			Properties = script.Parent.Modules:WaitForChild('Properties'),
+			Convert = script.Parent.Modules:WaitForChild('Convert'),
+			Notify = script.Parent.Modules:WaitForChild('Notify'),
+		},
+
+		VERSION = 1.0,
+		DATA = {},
+		UI = script.Parent:WaitForChild('UI'),
+
+		--! settings
+		SETTINGS = {
+			--! instance
+			OUTPUT = game.StarterGui,
+
+			--! string
+			CONVERSION_METHOD = 'Custom',
+			FUNCTION_NAME = 'add',
+			TABLE_NAME = 'instances',
+
+			--! bool
+			OPEN_ON_COMPLETION = false,
+			SHORTEN_VARIABLES = false,
+			USE_LOCAL = false,
+			USE_TABLE = false,
+			COMMENTS = false,
+			NEWLINES = true,
+		},
+
+		--! process
+		PROCESS = {
+			FONTS = {},
+			COUNTS = { 
+				TOTAL = 0, 
+				FAILURES = 0, 
+			},
+		}
+	}
