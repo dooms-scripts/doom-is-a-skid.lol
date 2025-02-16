@@ -1,4 +1,4 @@
---@ doom.dtw | blitz.win | v1.0.1
+--@ doom.dtw | blitz.win | v1.0.2
 --@ patch: polished
 
 --@ dependancies
@@ -108,6 +108,12 @@ blitz = {
 function blitz.init()
 	if blitz.win then
 		blitz.safe_load(blitz.win, true)
+	end
+end
+
+function blitz.exit()
+	if blitz.win then
+		blitz.win:Destroy()
 	end
 end
 
