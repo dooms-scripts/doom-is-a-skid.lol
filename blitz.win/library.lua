@@ -1,6 +1,5 @@
---@ Loading library
---@ doom.dtw | blitz.win | v1.0.0
---@ patch: ui finished
+--@ doom.dtw | blitz.win | v1.0.1
+--@ patch: polished
 
 --@ dependancies
 cloneref = cloneref or function(...) return ... end
@@ -59,7 +58,7 @@ blitz = {
 		end
 
 		local ElevationAllowed = pcall(function() local a = cloneref(game:GetService("CoreGui")):GetFullName() end)
-		i.Parent = ElevationAllowed and Services.CoreGui or warn('blitz.win | COULD NOT LOAD - Elevation failed.')
+		i.Parent = ElevationAllowed and Services.CoreGui or warn('blitz.win | COULD NOT LOAD - Elevation Failed')
 	end;
 
 	--@ instance creation
@@ -136,7 +135,7 @@ function blitz.new(name, ...)
 	local TitleCardFrame = blitz.create("Frame", { Parent = SidebarFrame, Name = [[TitleCardFrame]], BorderSizePixel = 0, Size = UDim2.new(1, 0, 0, 80), ClipsDescendants = true, BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 	local LargeTextLabel = blitz.create("TextLabel", { Parent = TitleCardFrame, Name = [[LargeTextLabel]], Visible = false, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 0.5), TextSize = 26, Size = UDim2.new(0, 200, 0, 50), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[blitz.win]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0.5, 0, 0.5, 0), TextColor3 = Color3.fromRGB(175, 175, 175), BackgroundTransparency = 1,})
 	local LibraryNameLabel = blitz.create("TextLabel", { Parent = TitleCardFrame, Name = [[LibraryNameLabel]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 0), TextSize = 26, Size = UDim2.new(0, 106, 0, 14), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = name, FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Medium, Enum.FontStyle.Normal), Position = UDim2.new(0.481999993, 0, 0.0250000004, 24), TextColor3 = blitz.accent, BackgroundTransparency = 1,})
-	local UserNameLabel = blitz.create("TextLabel", { Parent = TitleCardFrame, Name = [[UserNameLabel]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 0), TextSize = 20, Size = UDim2.new(0, 163, 0, 10), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = blitz.Services.Players.LocalPlayer.Name, TextTransparency = 0.75, FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0.592999995, 0, -0.0250000004, 46), TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1,})
+	local UserNameLabel = blitz.create("TextLabel", { Parent = TitleCardFrame, Name = [[UserNameLabel]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 0), TextSize = 20, Size = UDim2.new(0, 163, 0, 10), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = Services.Players.LocalPlayer.DisplayName, TextTransparency = 0.75, FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0.592999995, 0, -0.0250000004, 46), TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1,})
 	local ProfileIcon = blitz.create("ImageLabel", { Parent = TitleCardFrame, Name = [[ProfileIcon]], AnchorPoint = Vector2.new(0, 0.5), Image = [[rbxthumb://type=AvatarHeadShot&id=157406244&w=420&h=420]], BorderSizePixel = 0, Size = UDim2.new(0, 32, 0, 32), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(-0, 24, 0.5, 0), BackgroundColor3 = Color3.fromRGB(32, 32, 32),})
 	local ProfileStroke = blitz.create("UIStroke", { Parent = ProfileIcon, Color = Color3.fromRGB(255, 255, 255),})
 	local SettingsButton = blitz.create("ImageButton", { Parent = TitleCardFrame, Name = [[SettingsButton]], Visible = false, BackgroundTransparency = 1, Image = [[http://www.roblox.com/asset/?id=6031280882]], BorderSizePixel = 0, Size = UDim2.new(0, 16, 0, 16), BorderColor3 = Color3.fromRGB(0, 0, 0), ImageColor3 = Color3.fromRGB(75, 75, 75), Position = UDim2.new(0.812777758, 0, 0.419375002, 0), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
@@ -144,7 +143,7 @@ function blitz.new(name, ...)
 	local BigProfileIcon = blitz.create("ImageLabel", { Parent = TitleCardFrame, Name = [[BigProfileIcon]], Image = [[rbxthumb://type=AvatarHeadShot&id=157406244&w=420&h=420]], ZIndex = 0, BorderSizePixel = 0, Size = UDim2.new(0, 190, 0, 190), BorderColor3 = Color3.fromRGB(0, 0, 0), ImageTransparency = 0.5, Position = UDim2.new(-0.108000003, 0, -1, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 	local SideButtonsFrame = blitz.create("Frame", { Parent = SidebarFrame, Name = [[SideButtonsFrame]], BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, -100), BorderColor3 = Color3.fromRGB(0, 0, 0), LayoutOrder = 3, Position = UDim2.new(0, 0, 0.200000003, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 	local SideDividerFrame = blitz.create("Frame", { Parent = SidebarFrame, Name = [[SideDividerFrame]], BorderSizePixel = 0, Size = UDim2.new(1, 0, 0, 1), BorderColor3 = Color3.fromRGB(0, 0, 0), LayoutOrder = 2, BackgroundColor3 = Color3.fromRGB(32, 32, 32),})
-	local GradientFrame = blitz.create("Frame", { Parent = WindowFrame, Name = [[GradientFrame]], AnchorPoint = Vector2.new(1, 1), BorderSizePixel = 0, Size = UDim2.new(1, -251, -0.218181819, 200), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(1, 0, 1, 0), BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
+	local GradientFrame = blitz.create("Frame", { Parent = WindowFrame, Name = [[GradientFrame]], ZIndex = 999; AnchorPoint = Vector2.new(1, 1), BorderSizePixel = 0, Size = UDim2.new(1, -251, -0.218181819, 200), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(1, 0, 1, 0), BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
 	local DividerFrame = blitz.create("Frame", { Parent = WindowFrame, Name = [[DividerFrame]], BorderSizePixel = 0, Size = UDim2.new(0, 1, 1, 0), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0, 250, 0, 0), BackgroundTransparency = 0.5, BackgroundColor3 = Color3.fromRGB(32, 32, 32),})
 	blitz.create("UIGradient", { Parent = BigProfileIcon, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0, 0); NumberSequenceKeypoint.new(0.5922693610191345, 0.856249988079071, 0); NumberSequenceKeypoint.new(0.7768080234527588, 1, 0); NumberSequenceKeypoint.new(1, 1, 0);}), Rotation = 75, Offset = Vector2.new(0, 0.150000006),})
 	blitz.create("UIListLayout", { Parent = SideButtonsFrame, Padding = UDim.new(0, 15), SortOrder = Enum.SortOrder.LayoutOrder, HorizontalAlignment = Enum.HorizontalAlignment.Center,})
@@ -544,7 +543,7 @@ function blitz.new(name, ...)
 					OnKeyRelease = function(...) end;
 					OnKeyClick = function(...) end;
 					OnKeyUpdate = function(...) end;
-					
+
 					--@ Non-Tamper
 					Editing = false;
 					Pressed = false;
@@ -649,7 +648,7 @@ function blitz.new(name, ...)
 					SecondaryText = nil;
 					List = {};
 					OnSelect = function(...) end;
-					
+
 					--@ Non-Tamper
 					Dropped = false;
 				}, ... or {})
@@ -894,8 +893,7 @@ function blitz.new(name, ...)
 					Parent = Color, 
 					CornerRadius = UDim.new(1, 0),
 				})
-				blitz.create("UICorner", { 
-					Parent = value_map, 
+				blitz.create("UICorner", { Parent = value_map, 
 					CornerRadius = UDim.new(0, 4),
 				})
 				blitz.create("UICorner", { 
