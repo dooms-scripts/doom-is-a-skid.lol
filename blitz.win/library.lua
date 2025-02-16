@@ -1,4 +1,4 @@
---@ doom.dtw | blitz.win | v1.0.4
+--@ doom.dtw | blitz.win | v1.0.5
 --@ patch: polished
 
 --@ dependancies
@@ -100,7 +100,6 @@ blitz = {
 	['check_input'] = function(InputType : EnumItem)
 		if InputType == Enum.UserInputType.MouseMovement then return true end
 		if InputType == Enum.UserInputType.MouseButton1 then return true end
-		if InputType == Enum.UserInputType.Keyboard then return true end
 		if InputType == Enum.UserInputType.Touch then return true end
 	end
 }
@@ -119,41 +118,51 @@ function blitz.exit()
 end
 
 function blitz.update(...)
-	local NewData = {...}
+	print('updat')
+	local NewData = ...
 	if NewData.accent then
+		print('updat2')
 		for _, Page in blitz.pages do
 			for _, Descendant in Page.Instance:GetDescendants() do
 				if Descendant:IsA('TextButton') then
-					if Descendant.TextColor3 = blitz.accent then pcall(blitz.tween(Descendant, {TextColor3 = NewData.accent})) end
-					if Descendant.BackgroundColor3 = blitz.accent then pcall(blitz.tween(Descendant, {BackgroundColor3 = NewData.accent})) end
+					--print(blitz.accent, Descendant.BackgroundColor3)
+					
+					if Descendant.TextColor3 == blitz.accent then
+						pcall(function() blitz.tween(Descendant, {TextColor3 = NewData.accent}) end) 
+					end
+					
+					if Descendant.BackgroundColor3 == blitz.accent then 
+						print(Descendant)
+						blitz.tween(Descendant, {BackgroundColor3 = NewData.accent})
+					end
 				end
-				
+
 				if Descendant:IsA('TextLabel') then
-					if Descendant.TextColor3 = blitz.accent then pcall(blitz.tween(Descendant, {TextColor3 = NewData.accent})) end
-					if Descendant.BackgroundColor3 = blitz.accent then pcall(blitz.tween(Descendant, {BackgroundColor3 = NewData.accent})) end
+					if Descendant.TextColor3 == blitz.accent then pcall(function() blitz.tween(Descendant, {TextColor3 = NewData.accent}) end) end
+					if Descendant.BackgroundColor3 == blitz.accent then pcall(function() blitz.tween(Descendant, {BackgroundColor3 = NewData.accent}) end) end
 				end
-				
+
 				if Descendant:IsA('ImageLabel') then
-					if Descendant.ImageColor3 = blitz.accent then pcall(blitz.tween(Descendant, {ImageColor3 = NewData.accent})) end
-					if Descendant.BackgroundColor3 = blitz.accent then pcall(blitz.tween(Descendant, {BackgroundColor3 = NewData.accent})) end
+					if Descendant.ImageColor3 == blitz.accent then pcall(function() blitz.tween(Descendant, {ImageColor3 = NewData.accent}) end) end
+					if Descendant.BackgroundColor3 == blitz.accent then pcall(function() blitz.tween(Descendant, {BackgroundColor3 = NewData.accent}) end) end
 				end
-				
+
 				if Descendant:IsA('ImageButton') then
-					if Descendant.ImageColor3 = blitz.accent then pcall(blitz.tween(Descendant, {ImageColor3 = NewData.accent})) end
-					if Descendant.BackgroundColor3 = blitz.accent then pcall(blitz.tween(Descendant, {BackgroundColor3 = NewData.accent})) end
+					if Descendant.ImageColor3 == blitz.accent then pcall(function() blitz.tween(Descendant, {ImageColor3 = NewData.accent}) end) end
+					if Descendant.BackgroundColor3 == blitz.accent then pcall(function() blitz.tween(Descendant, {BackgroundColor3 = NewData.accent}) end) end
 				end
-				
+
 				if Descendant:IsA('Frame') then
-					if Descendant.BackgroundColor3 = blitz.accent then pcall(blitz.tween(Descendant, {BackgroundColor3 = NewData.accent})) end
+					if Descendant.BackgroundColor3 == blitz.accent then pcall(function() blitz.tween(Descendant, {BackgroundColor3 = NewData.accent}) end) end
 				end
-				
+
 				if Descendant:IsA('UIStroke') then
-					if Descendant.Color = blitz.accent then pcall(blitz.tween(Descendant, {Color = NewData.accent})) end
+					if Descendant.Color == blitz.accent then pcall(function() blitz.tween(Descendant, {Color = NewData.accent}) end) end
 				end
 			end
 		end
 	end
-					
+	
 	blitz.accent = NewData.accent
 end
 --@ window function
@@ -174,7 +183,7 @@ function blitz.new(name, ...)
 		Hidden = false;
 		Tabs = {}
 	}, ... or {})
-	
+
 	--@ Instances
 	local WindowFrame = blitz.create("Frame", { Parent = nil, Name = [[WindowFrame]], BorderSizePixel = 0, Size = Window.Size, BorderColor3 = Color3.fromRGB(0, 0, 0), Position = Window.Pos, BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
 	local SidebarFrame = blitz.create("Frame", { Parent = WindowFrame, Name = [[SidebarFrame]], BorderSizePixel = 0, Size = UDim2.new(0, 250, 0, 550), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
@@ -229,13 +238,7 @@ function blitz.new(name, ...)
 		if Input.KeyCode == Window.ToggleKey then
 			if not Services.UserInputService:GetFocusedTextBox() then
 				Window.Hidden = not Window.Hidden
-
-				--blitz.tween(
-				--	WindowFrame,
-				--	{ Size = Window.Hidden and UDim2.new(Window.Size.X.Scale, Window.Size.X.Offset, 0, 0) or Window.Size }
-				--)
-
-				WindowFrame.Visible = not Window.Hidden
+				WindowFrame.Visible = Window.Hidden
 			end
 		end
 
@@ -245,10 +248,11 @@ function blitz.new(name, ...)
 			Window.Dragging = true
 		end
 
+		-- >> Input Ended
 		Input.Changed:Connect(function(InputType)
 			local InputState = Input.UserInputState
 
-			if InputState == Enum.UserInputState.End then
+			if InputState == Enum.UserInputState.End and Input.UserInputType ~= Enum.UserInputType.Keyboard then
 				Window.Dragging = false
 			end
 		end)
@@ -497,7 +501,7 @@ function blitz.new(name, ...)
 				--@ Instance Creation
 				local ElementFrame = blitz.create("Frame", { Parent = SectionContent, Name = [[ElementFrame]], BorderSizePixel = 0, Size = UDim2.new(1, 0, 0, 36), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 				local ElementTitle = blitz.create("TextLabel", { Parent = ElementFrame, Name = [[ElementText]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0, 0.5), TextSize = 20, Size = UDim2.new(1, 0, 1, 0), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[Toggle]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0, 0, 0.5, 0), TextColor3 = Color3.fromRGB(175, 175, 175), BackgroundTransparency = 1,})
-				local ElementButton = blitz.create("TextButton", { Parent = ElementFrame, Name = [[ElementButton]], BorderSizePixel = 0, AutoButtonColor = false, BackgroundColor3 = Color3.fromRGB(172, 144, 255), AnchorPoint = Vector2.new(1, 0.5), TextSize = 14, Size = UDim2.new(0, 44, 0, 20), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[]], Font = Enum.Font.SourceSans, Position = UDim2.new(1, 0, 0.5, 0), TextColor3 = Color3.fromRGB(0, 0, 0),})
+				local ElementButton = blitz.create("TextButton", { Parent = ElementFrame, Name = [[ElementButton]], BorderSizePixel = 0, AutoButtonColor = false, BackgroundColor3 = blitz.accent, AnchorPoint = Vector2.new(1, 0.5), TextSize = 14, Size = UDim2.new(0, 44, 0, 20), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[]], Font = Enum.Font.SourceSans, Position = UDim2.new(1, 0, 0.5, 0), TextColor3 = Color3.fromRGB(0, 0, 0),})
 				local Circle = blitz.create("ImageLabel", { Parent = ElementButton, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(1, 0.5), Size = UDim2.new(1, -6, 1, -6), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(1, 0, 0.5, 0),})
 				blitz.create("UICorner", { Parent = ElementButton, CornerRadius = UDim.new(1, 0),})
 				blitz.create("UICorner", { Parent = Circle, CornerRadius = UDim.new(1, 0),})
@@ -881,12 +885,12 @@ function blitz.new(name, ...)
 
 				Mouse.Move:Connect(function() if MouseDown then update_value() end end)
 
-				ElementButton.MouseButton1Down:Connect(function() 
+				SliderButton.MouseButton1Down:Connect(function() 
 					MouseDown = true update_value()
 					blitz.tween(SliderValue, {TextTransparency = 0})
 				end)
 
-				ElementButton.MouseButton1Up:Connect(function() 
+				SliderButton.MouseButton1Up:Connect(function() 
 					MouseDown = false 
 					blitz.tween(SliderValue, {TextTransparency = 1})
 				end)
@@ -894,12 +898,12 @@ function blitz.new(name, ...)
 				ElementButton.MouseEnter:Connect(function() MouseEnter = true end)
 
 				ElementButton.MouseLeave:Connect(function() MouseEnter = false 
-					blitz.tween(SliderValue, {TextTransparency = 1})
 				end)
 
 				Services.UserInputService.InputEnded:Connect(function(input)
 					if input.UserInputType == Enum.UserInputType.MouseButton1 then
 						MouseDown = false
+						blitz.tween(SliderValue, {TextTransparency = 1})
 					end
 				end)
 
