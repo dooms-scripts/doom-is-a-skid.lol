@@ -11,6 +11,7 @@ end})
 
 --@ library
 blitz = { 
+	pages = {};
 	win = nil; 
 	accent = Color3.fromRGB(255, 255, 255);
 
@@ -117,6 +118,44 @@ function blitz.exit()
 	end
 end
 
+function blitz.update(...)
+	local NewData = {...}
+	if NewData.accent then
+		for _, Page in blitz.pages do
+			for _, Descendant in Page.Instance:GetDescendants() do
+				if Descendant:IsA('TextButton') then
+					if Descendant.TextColor3 = blitz.accent then pcall(blitz.tween(Descendant, {TextColor3 = NewData.accent})) end
+					if Descendant.BackgroundColor3 = blitz.accent then pcall(blitz.tween(Descendant, {BackgroundColor3 = NewData.accent})) end
+				end
+				
+				if Descendant:IsA('TextLabel') then
+					if Descendant.TextColor3 = blitz.accent then pcall(blitz.tween(Descendant, {TextColor3 = NewData.accent})) end
+					if Descendant.BackgroundColor3 = blitz.accent then pcall(blitz.tween(Descendant, {BackgroundColor3 = NewData.accent})) end
+				end
+				
+				if Descendant:IsA('ImageLabel') then
+					if Descendant.ImageColor3 = blitz.accent then pcall(blitz.tween(Descendant, {ImageColor3 = NewData.accent})) end
+					if Descendant.BackgroundColor3 = blitz.accent then pcall(blitz.tween(Descendant, {BackgroundColor3 = NewData.accent})) end
+				end
+				
+				if Descendant:IsA('ImageButton') then
+					if Descendant.ImageColor3 = blitz.accent then pcall(blitz.tween(Descendant, {ImageColor3 = NewData.accent})) end
+					if Descendant.BackgroundColor3 = blitz.accent then pcall(blitz.tween(Descendant, {BackgroundColor3 = NewData.accent})) end
+				end
+				
+				if Descendant:IsA('Frame') then
+					if Descendant.BackgroundColor3 = blitz.accent then pcall(blitz.tween(Descendant, {BackgroundColor3 = NewData.accent})) end
+				end
+				
+				if Descendant:IsA('UIStroke') then
+					if Descendant.Color = blitz.accent then pcall(blitz.tween(Descendant, {Color = NewData.accent})) end
+				end
+			end
+		end
+	end
+					
+	blitz.accent = NewData.accent
+end
 --@ window function
 function blitz.new(name, ...)
 	--@ Metadata
@@ -127,6 +166,7 @@ function blitz.new(name, ...)
 		ToggleKey = nil;
 
 		--@ Don't tamper
+		Instance = nil;
 		Dragging = false;
 		DragPos = nil;
 		FramePos = nil;
@@ -142,8 +182,11 @@ function blitz.new(name, ...)
 	local LargeTextLabel = blitz.create("TextLabel", { Parent = TitleCardFrame, Name = [[LargeTextLabel]], Visible = false, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 0.5), TextSize = 26, Size = UDim2.new(0, 200, 0, 50), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[blitz.win]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0.5, 0, 0.5, 0), TextColor3 = Color3.fromRGB(175, 175, 175), BackgroundTransparency = 1,})
 	local LibraryNameLabel = blitz.create("TextLabel", { Parent = TitleCardFrame, Name = [[LibraryNameLabel]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 0), TextSize = 26, Size = UDim2.new(0, 106, 0, 14), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = name, FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Medium, Enum.FontStyle.Normal), Position = UDim2.new(0.481999993, 0, 0.0250000004, 24), TextColor3 = blitz.accent, BackgroundTransparency = 1,})
 	local UserNameLabel = blitz.create("TextLabel", { Parent = TitleCardFrame, Name = [[UserNameLabel]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 0), TextSize = 20, Size = UDim2.new(0, 163, 0, 10), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = Services.Players.LocalPlayer.DisplayName, TextTransparency = 0.75, FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0.592999995, 0, -0.0250000004, 46), TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1,})
-	local ProfileIcon = blitz.create("ImageLabel", { Parent = TitleCardFrame, Name = [[ProfileIcon]], AnchorPoint = Vector2.new(0, 0.5), Image = `rbxthumb://type=AvatarHeadShot&id={Services.Players.LocalPlayer.UserId}&w=420&h=420`, BorderSizePixel = 0, Size = UDim2.new(0, 32, 0, 32), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(-0, 24, 0.5, 0), BackgroundColor3 = Color3.fromRGB(32, 32, 32),})
-	local ProfileStroke = blitz.create("UIStroke", { Parent = ProfileIcon, Color = Color3.fromRGB(255, 255, 255),})
+	local ProfileIcon = blitz.create("ImageLabel", { Parent = TitleCardFrame, Name = [[ProfileIcon]], AnchorPoint = Vector2.new(0, 0.5), Image = [[rbxthumb://type=AvatarHeadShot&id=157406244&w=420&h=420]], BorderSizePixel = 0, Size = UDim2.new(0, 32, 0, 32), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(-0, 24, 0.5, 0), BackgroundColor3 = Color3.fromRGB(32, 32, 32),})
+	local UICorner = blitz.create("UICorner", { Parent = ProfileIcon,})
+	local UIStroke = blitz.create("UIStroke", { Parent = ProfileIcon, Color = blitz.accent,})
+	local UIGradient = blitz.create("UIGradient", { Parent = UIStroke, Enabled = false, Rotation = -125, Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.fromRGB(52.000000700354576, 52.000000700354576, 52.000000700354576)); ColorSequenceKeypoint.new(0.30103808641433716, Color3.fromRGB(55.00000052154064, 53.00000064074993, 56.000000461936)); ColorSequenceKeypoint.new(1, Color3.fromRGB(177.0000046491623, 144.00000661611557, 255));}),})
+	local UIGradient2 = blitz.create("UIGradient", { Parent = UIStroke, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1, 0); NumberSequenceKeypoint.new(0.35286784172058105, 0.856249988079071, 0); NumberSequenceKeypoint.new(0.6583541631698608, 0.606249988079071, 0); NumberSequenceKeypoint.new(1, 0, 0);}), Rotation = -125,})
 	local SettingsButton = blitz.create("ImageButton", { Parent = TitleCardFrame, Name = [[SettingsButton]], Visible = false, BackgroundTransparency = 1, Image = [[http://www.roblox.com/asset/?id=6031280882]], BorderSizePixel = 0, Size = UDim2.new(0, 16, 0, 16), BorderColor3 = Color3.fromRGB(0, 0, 0), ImageColor3 = Color3.fromRGB(75, 75, 75), Position = UDim2.new(0.812777758, 0, 0.419375002, 0), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 	local Ambience = blitz.create("Frame", { Parent = TitleCardFrame, Name = [[Ambience]], BorderSizePixel = 0, Size = UDim2.new(0, 251, 0, 118), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 0.8999999761581421, BackgroundColor3 = blitz.accent,})
 	local BigProfileIcon = blitz.create("ImageLabel", { Parent = TitleCardFrame, Name = [[BigProfileIcon]], Image = `rbxthumb://type=AvatarHeadShot&id={Services.Players.LocalPlayer.UserId}&w=420&h=420`, ZIndex = 0, BorderSizePixel = 0, Size = UDim2.new(0, 190, 0, 190), BorderColor3 = Color3.fromRGB(0, 0, 0), ImageTransparency = 0.5, Position = UDim2.new(-0.108000003, 0, -1, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
@@ -158,7 +201,6 @@ function blitz.new(name, ...)
 	blitz.create("UIGradient", { Parent = Ambience, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0, 0); NumberSequenceKeypoint.new(0.6533666253089905, 1, 0); NumberSequenceKeypoint.new(1, 1, 0);}), Rotation = 66,})
 	blitz.create("UICorner", { Parent = Ambience, CornerRadius = UDim.new(0, 11),})
 	blitz.create("UICorner", { Parent = ProfileIcon,})
-	blitz.create("UIGradient", { Parent = ProfileStroke, Rotation = -125, Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.fromRGB(52.000000700354576, 52.000000700354576, 52.000000700354576)); ColorSequenceKeypoint.new(0.30103808641433716, Color3.fromRGB(55.00000052154064, 53.00000064074993, 56.000000461936)); ColorSequenceKeypoint.new(1, blitz.accent);}),})
 	blitz.create("UIGradient", { Parent = SideDividerFrame, Enabled = false, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1, 0); NumberSequenceKeypoint.new(0.5, 0, 0); NumberSequenceKeypoint.new(1, 1, 0);}),})
 	blitz.create("UIListLayout", { Parent = SidebarFrame, SortOrder = Enum.SortOrder.LayoutOrder,})
 	blitz.create("UICorner", { Parent = WindowFrame, CornerRadius = UDim.new(0, 12),})
@@ -176,6 +218,8 @@ function blitz.new(name, ...)
 
 		--@ load window into ui
 		WindowFrame.Parent = blitz.win
+		Window.Instance = WindowFrame
+		blitz.pages[name] = Window
 	end
 
 	--@ Functions + Connections
