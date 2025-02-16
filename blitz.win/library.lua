@@ -134,21 +134,9 @@ function blitz.new(name, ...)
 		Hidden = false;
 		Tabs = {}
 	}, ... or {})
-
-	--@ if ui doesn't exist, create
-	if not blitz.win then
-		blitz.win = blitz.create("ScreenGui", {
-			Parent = nil,
-			Name = [[blitz.win]],
-			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-		})
-
-		--@ load window into ui
-		WindowFrame.Parent = blitz.win
-	end
 	
 	--@ Instances
-	local WindowFrame = blitz.create("Frame", { Parent = blitz.win, Name = [[WindowFrame]], BorderSizePixel = 0, Size = Window.Size, BorderColor3 = Color3.fromRGB(0, 0, 0), Position = Window.Pos, BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
+	local WindowFrame = blitz.create("Frame", { Parent = nil, Name = [[WindowFrame]], BorderSizePixel = 0, Size = Window.Size, BorderColor3 = Color3.fromRGB(0, 0, 0), Position = Window.Pos, BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
 	local SidebarFrame = blitz.create("Frame", { Parent = WindowFrame, Name = [[SidebarFrame]], BorderSizePixel = 0, Size = UDim2.new(0, 250, 0, 550), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
 	local TitleCardFrame = blitz.create("Frame", { Parent = SidebarFrame, Name = [[TitleCardFrame]], BorderSizePixel = 0, Size = UDim2.new(1, 0, 0, 80), ClipsDescendants = true, BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 	local LargeTextLabel = blitz.create("TextLabel", { Parent = TitleCardFrame, Name = [[LargeTextLabel]], Visible = false, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 0.5), TextSize = 26, Size = UDim2.new(0, 200, 0, 50), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[blitz.win]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0.5, 0, 0.5, 0), TextColor3 = Color3.fromRGB(175, 175, 175), BackgroundTransparency = 1,})
@@ -178,6 +166,17 @@ function blitz.new(name, ...)
 	blitz.create("UIGradient", { Parent = GradientFrame, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1, 0); NumberSequenceKeypoint.new(1, 0, 0);}), Rotation = 90,})
 	blitz.create("UIGradient", { Parent = DividerFrame, Enabled = false, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1, 0); NumberSequenceKeypoint.new(0.5, 0, 0); NumberSequenceKeypoint.new(1, 1, 0);}), Rotation = 90,})
 
+	--@ if ui doesn't exist, create
+	if not blitz.win then
+		blitz.win = blitz.create("ScreenGui", {
+			Parent = nil,
+			Name = [[blitz.win]],
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+		})
+
+		--@ load window into ui
+		WindowFrame.Parent = blitz.win
+	end
 
 	--@ Functions + Connections
 	Services.UserInputService.InputBegan:Connect(function(Input)
