@@ -1,5 +1,8 @@
---@ doom.dtw | blitz.win | v1.0.7
---@ patch: remade color picker + slider
+--@ doom.dtw | blitz.win | v1.0.8
+--@ patch: 
+--@ 	remade color picker
+--@	added watermark
+--@	fixed visual bugs
 
 --@ dependancies
 cloneref = cloneref or function(...) return ... end
@@ -60,11 +63,11 @@ blitz = {
 		end
 
 		local ElevationAllowed = pcall(function() local a = cloneref(game:GetService("CoreGui")):GetFullName() end)
-		i.Parent = ElevationAllowed and Services.CoreGui or game.Players.LocalPlayer.PlayerGui --or warn('blitz.win | COULD NOT LOAD - Elevation Failed')
+		i.Parent = ElevationAllowed and Services.CoreGui or warn('blitz.win | COULD NOT LOAD - Elevation Failed')
 	end;
 
 	--@ instance creation
-	['create'] = function(class : string, properties : {})
+	['create'] = function(class : string, properties : {}, attributes : {} )
 		local i
 
 		local madeInstance, errorMessage = pcall(function()
@@ -82,6 +85,12 @@ blitz = {
 
 			if err then 
 				return warn(`[{i}] Problem adding instance: {err}`) 
+			end
+		end
+
+		if attributes then
+			for attribute, value in attributes do
+				i:SetAttribute(attribute, value)
 			end
 		end
 
@@ -120,50 +129,98 @@ end
 
 function blitz.update(...)
 	local NewData = ...
+	
 	if NewData.accent then
 		for _, Page in blitz.pages do
 			for _, Descendant in Page.Instance:GetDescendants() do
-				if Descendant:IsA('TextButton') then
-					--print(blitz.accent, Descendant.BackgroundColor3)
-
-					if Descendant.TextColor3 == blitz.accent then
-						pcall(function() blitz.tween(Descendant, {TextColor3 = NewData.accent}) end) 
-					end
-
-					if Descendant.BackgroundColor3 == blitz.accent then 
-						print(Descendant)
-						blitz.tween(Descendant, {BackgroundColor3 = NewData.accent})
-					end
-				end
-
-				if Descendant:IsA('TextLabel') then
-					if Descendant.TextColor3 == blitz.accent then pcall(function() blitz.tween(Descendant, {TextColor3 = NewData.accent}) end) end
-					if Descendant.BackgroundColor3 == blitz.accent then pcall(function() blitz.tween(Descendant, {BackgroundColor3 = NewData.accent}) end) end
-				end
-
-				if Descendant:IsA('ImageLabel') then
-					if Descendant.ImageColor3 == blitz.accent then pcall(function() blitz.tween(Descendant, {ImageColor3 = NewData.accent}) end) end
-					if Descendant.BackgroundColor3 == blitz.accent then pcall(function() blitz.tween(Descendant, {BackgroundColor3 = NewData.accent}) end) end
-				end
-
-				if Descendant:IsA('ImageButton') then
-					if Descendant.ImageColor3 == blitz.accent then pcall(function() blitz.tween(Descendant, {ImageColor3 = NewData.accent}) end) end
-					if Descendant.BackgroundColor3 == blitz.accent then pcall(function() blitz.tween(Descendant, {BackgroundColor3 = NewData.accent}) end) end
-				end
-
-				if Descendant:IsA('Frame') then
-					if Descendant.BackgroundColor3 == blitz.accent then pcall(function() blitz.tween(Descendant, {BackgroundColor3 = NewData.accent}) end) end
-				end
-
-				if Descendant:IsA('UIStroke') then
-					if Descendant.Color == blitz.accent then pcall(function() blitz.tween(Descendant, {Color = NewData.accent}) end) end
+				if Descendant:GetAttribute('Accent') then
+					pcall(function() blitz.tween(Descendant, { Color = NewData.accent }) end)
+					pcall(function() blitz.tween(Descendant, { TextColor3 = NewData.accent }) end)
+					pcall(function() blitz.tween(Descendant, { ImageColor3 = NewData.accent }) end)
+					pcall(function() blitz.tween(Descendant, { BackgroundColor3 = NewData.accent }) end)
 				end
 			end
-		end
+		end	
 	end
 
 	blitz.accent = NewData.accent
 end
+
+function blitz.watermark(text)
+	--@ Metadata
+	local Watermark = {
+		Dragging = false;
+		DragPos = nil;
+		FramePos = nil;
+		DeltaPos = nil;
+		Hidden = false;
+	}
+	
+	--@ Instances
+	local WatermarkFrame = blitz.create("Frame", { Parent = blitz.win, Name = [[Watermark]], AutomaticSize = Enum.AutomaticSize.X, BorderSizePixel = 0, Size = UDim2.new(0, 0, 0, 30), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0.0136208851, 0, 0.0207972266, 0), BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
+	local WatermarkLabel = blitz.create("TextLabel", { Parent = WatermarkFrame, RichText = true, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 0.5), TextSize = 18, Size = UDim2.new(0, 423, 0, 14), BorderColor3 = Color3.fromRGB(0, 0, 0), FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0.501184821, 0, 0.5, 0), TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1,})
+	blitz.create("UIListLayout", { Parent = WatermarkFrame, VerticalAlignment = Enum.VerticalAlignment.Center, FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder, HorizontalAlignment = Enum.HorizontalAlignment.Center,})
+	blitz.create("UICorner", { Parent = WatermarkFrame, CornerRadius = UDim.new(0, 6),})
+
+	WatermarkLabel.Text = text
+	
+	task.wait()
+	WatermarkLabel.Size = UDim2.fromOffset(WatermarkLabel.TextBounds.X + 20, 30)	
+	
+	--@ Functions + Connections
+	function Watermark:Edit(new_text)
+		WatermarkLabel.Text = new_text
+
+		task.wait()
+		WatermarkLabel.Size = UDim2.fromOffset(WatermarkLabel.TextBounds.X + 20, 30)	
+	end
+	
+	function Watermark:Toggle(v)
+		WatermarkFrame.Visible = v
+	end
+	
+	function Watermark:Destroy()
+		WatermarkFrame:Destroy()
+	end
+	
+	--@ Functions + Connections
+	Services.UserInputService.InputBegan:Connect(function(Input)
+		local InputType = Input.UserInputType
+
+		if blitz.check_input(InputType) and WatermarkFrame.GuiState == Enum.GuiState.Press then
+			Watermark.DragPos = Input.Position
+			Watermark.FramePos = WatermarkFrame.Position
+			Watermark.Dragging = true
+		end
+
+		-- >> Input Ended
+		Input.Changed:Connect(function(InputType)
+			local InputState = Input.UserInputState
+
+			if InputState == Enum.UserInputState.End and Input.UserInputType ~= Enum.UserInputType.Keyboard then
+				Watermark.Dragging = false
+			end
+		end)
+	end)
+
+	Services.UserInputService.InputChanged:Connect(function(Input)
+		local InputType = Input.UserInputType
+
+		if blitz.check_input(InputType) then
+			if Watermark.Dragging then
+				Watermark.DeltaPos = Input.Position - Watermark.DragPos
+
+				WatermarkFrame.Position = UDim2.new(
+					Watermark.FramePos.X.Scale, Watermark.FramePos.X.Offset + Watermark.DeltaPos.X,
+					Watermark.FramePos.Y.Scale, Watermark.FramePos.Y.Offset + Watermark.DeltaPos.Y
+				)
+			end
+		end
+	end)
+	
+	return Watermark
+end
+
 --@ window function
 function blitz.new(name, ...)
 	--@ Metadata
@@ -188,15 +245,15 @@ function blitz.new(name, ...)
 	local SidebarFrame = blitz.create("Frame", { Parent = WindowFrame, Name = [[SidebarFrame]], BorderSizePixel = 0, Size = UDim2.new(0, 250, 0, 550), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
 	local TitleCardFrame = blitz.create("Frame", { Parent = SidebarFrame, Name = [[TitleCardFrame]], BorderSizePixel = 0, Size = UDim2.new(1, 0, 0, 80), ClipsDescendants = true, BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 	local LargeTextLabel = blitz.create("TextLabel", { Parent = TitleCardFrame, Name = [[LargeTextLabel]], Visible = false, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 0.5), TextSize = 26, Size = UDim2.new(0, 200, 0, 50), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[blitz.win]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0.5, 0, 0.5, 0), TextColor3 = Color3.fromRGB(175, 175, 175), BackgroundTransparency = 1,})
-	local LibraryNameLabel = blitz.create("TextLabel", { Parent = TitleCardFrame, Name = [[LibraryNameLabel]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 0), TextSize = 26, Size = UDim2.new(0, 106, 0, 14), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = name, FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Medium, Enum.FontStyle.Normal), Position = UDim2.new(0.481999993, 0, 0.0250000004, 24), TextColor3 = blitz.accent, BackgroundTransparency = 1,})
+	local LibraryNameLabel = blitz.create("TextLabel", { Parent = TitleCardFrame, Name = [[LibraryNameLabel]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 0), TextSize = 26, Size = UDim2.new(0, 106, 0, 14), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = name, FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Medium, Enum.FontStyle.Normal), Position = UDim2.new(0.481999993, 0, 0.0250000004, 24), TextColor3 = blitz.accent, BackgroundTransparency = 1,}, { ["Accent"] = true })
 	local UserNameLabel = blitz.create("TextLabel", { Parent = TitleCardFrame, Name = [[UserNameLabel]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 0), TextSize = 20, Size = UDim2.new(0, 163, 0, 10), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = Services.Players.LocalPlayer.DisplayName, TextTransparency = 0.75, FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0.592999995, 0, -0.0250000004, 46), TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1,})
 	local ProfileIcon = blitz.create("ImageLabel", { Parent = TitleCardFrame, Name = [[ProfileIcon]], AnchorPoint = Vector2.new(0, 0.5), Image = `rbxthumb://type=AvatarHeadShot&id={Services.Players.LocalPlayer.UserId}&w=420&h=420`, BorderSizePixel = 0, Size = UDim2.new(0, 32, 0, 32), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(-0, 24, 0.5, 0), BackgroundColor3 = Color3.fromRGB(32, 32, 32),})
 	local UICorner = blitz.create("UICorner", { Parent = ProfileIcon,})
-	local UIStroke = blitz.create("UIStroke", { Parent = ProfileIcon, Color = blitz.accent,})
+	local UIStroke = blitz.create("UIStroke", { Parent = ProfileIcon, Color = blitz.accent,}, {["Accent"] = true })
 	local UIGradient = blitz.create("UIGradient", { Parent = UIStroke, Enabled = false, Rotation = -125, Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.fromRGB(52.000000700354576, 52.000000700354576, 52.000000700354576)); ColorSequenceKeypoint.new(0.30103808641433716, Color3.fromRGB(55.00000052154064, 53.00000064074993, 56.000000461936)); ColorSequenceKeypoint.new(1, Color3.fromRGB(177.0000046491623, 144.00000661611557, 255));}),})
 	local UIGradient2 = blitz.create("UIGradient", { Parent = UIStroke, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1, 0); NumberSequenceKeypoint.new(0.35286784172058105, 0.856249988079071, 0); NumberSequenceKeypoint.new(0.6583541631698608, 0.606249988079071, 0); NumberSequenceKeypoint.new(1, 0, 0);}), Rotation = -125,})
 	local SettingsButton = blitz.create("ImageButton", { Parent = TitleCardFrame, Name = [[SettingsButton]], Visible = false, BackgroundTransparency = 1, Image = [[http://www.roblox.com/asset/?id=6031280882]], BorderSizePixel = 0, Size = UDim2.new(0, 16, 0, 16), BorderColor3 = Color3.fromRGB(0, 0, 0), ImageColor3 = Color3.fromRGB(75, 75, 75), Position = UDim2.new(0.812777758, 0, 0.419375002, 0), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
-	local Ambience = blitz.create("Frame", { Parent = TitleCardFrame, Name = [[Ambience]], BorderSizePixel = 0, Size = UDim2.new(0, 251, 0, 118), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 0.8999999761581421, BackgroundColor3 = blitz.accent,})
+	local Ambience = blitz.create("Frame", { Parent = TitleCardFrame, Name = [[Ambience]], BorderSizePixel = 0, Size = UDim2.new(0, 251, 0, 118), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 0.8999999761581421, BackgroundColor3 = blitz.accent,}, { ["Accent"] = true })
 	local BigProfileIcon = blitz.create("ImageLabel", { Parent = TitleCardFrame, Name = [[BigProfileIcon]], Image = `rbxthumb://type=AvatarHeadShot&id={Services.Players.LocalPlayer.UserId}&w=420&h=420`, ZIndex = 0, BorderSizePixel = 0, Size = UDim2.new(0, 190, 0, 190), BorderColor3 = Color3.fromRGB(0, 0, 0), ImageTransparency = 0.5, Position = UDim2.new(-0.108000003, 0, -1, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 	local SideButtonsFrame = blitz.create("Frame", { Parent = SidebarFrame, Name = [[SideButtonsFrame]], BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, -100), BorderColor3 = Color3.fromRGB(0, 0, 0), LayoutOrder = 3, Position = UDim2.new(0, 0, 0.200000003, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 	local SideDividerFrame = blitz.create("Frame", { Parent = SidebarFrame, Name = [[SideDividerFrame]], BorderSizePixel = 0, Size = UDim2.new(1, 0, 0, 1), BorderColor3 = Color3.fromRGB(0, 0, 0), LayoutOrder = 2, BackgroundColor3 = Color3.fromRGB(32, 32, 32),})
@@ -293,10 +350,10 @@ function blitz.new(name, ...)
 		blitz.create("UIListLayout", { Parent = SearchBar, FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 5), SortOrder = Enum.SortOrder.LayoutOrder,})
 
 		local TabButton = blitz.create("TextButton", { Parent = SideButtonsFrame, Name = [[TabButton]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), TextSize = 20, Size = UDim2.new(1, -40, 0, 36), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = Name, TextTransparency = 1, FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), TextColor3 = Color3.fromRGB(125, 125, 125), BackgroundTransparency = 1,})
-		local ImageLabel = blitz.create("ImageLabel", { Parent = TabButton, AnchorPoint = Vector2.new(0, 0.5), Image = Icon or nil, BorderSizePixel = 0, Size = UDim2.new(0, 18, 0, 18), BorderColor3 = Color3.fromRGB(0, 0, 0), ImageColor3 = Color3.fromRGB(125, 125, 125), Position = UDim2.new(0, 20, 0.5, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
-		local ButtonText = blitz.create("TextLabel", { Parent = TabButton, TextWrapped = true, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), TextSize = 20, Size = UDim2.new(0, 100, 1, 0), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = Name, FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0, 50, 0, 0), TextColor3 = Color3.fromRGB(125, 125, 125), BackgroundTransparency = 1,})
-		local ButtonStroke = blitz.create("UIStroke", { Parent = TabButton, Name = [[ButtonStroke]], ApplyStrokeMode = Enum.ApplyStrokeMode.Border, Transparency = 1, Color = blitz.accent,})
-		local ButtonAmbience = blitz.create("Frame", { Parent = TabButton, Name = [[ButtonAmbience]], ZIndex = 0, BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1, BackgroundColor3 = blitz.accent,})
+		local ButtonIcon = blitz.create("ImageLabel", { Parent = TabButton, AnchorPoint = Vector2.new(0, 0.5), Image = Icon or nil, BorderSizePixel = 0, Size = UDim2.new(0, 18, 0, 18), BorderColor3 = Color3.fromRGB(0, 0, 0), ImageColor3 = Color3.fromRGB(125, 125, 125), Position = UDim2.new(0, 20, 0.5, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
+		local ButtonText = blitz.create("TextLabel", { Parent = TabButton, TextWrapped = true, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), TextSize = 20, Size = UDim2.new(0, 100, 1, 0), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = Name, FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0, 50, 0, 0), TextColor3 = Color3.fromRGB(125, 125, 125), BackgroundTransparency = 1,}, { ["Accent"] = false })
+		local ButtonStroke = blitz.create("UIStroke", { Parent = TabButton, Name = [[ButtonStroke]], ApplyStrokeMode = Enum.ApplyStrokeMode.Border, Transparency = 1, Color = blitz.accent,}, { ["Accent"] = true })
+		local ButtonAmbience = blitz.create("Frame", { Parent = TabButton, Name = [[ButtonAmbience]], ZIndex = 0, BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1, BackgroundColor3 = blitz.accent,}, { ["Accent"] = true })
 		blitz.create("UICorner", { Parent = ButtonAmbience, CornerRadius = UDim.new(0, 4),})
 		blitz.create("UIGradient", { Parent = ButtonAmbience, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.824999988079071, 0); NumberSequenceKeypoint.new(0.5, 0.6437499523162842, 0); NumberSequenceKeypoint.new(1, 0.41874998807907104, 0);}), Rotation = 15,})
 		blitz.create("UICorner", { Parent = TabButton, CornerRadius = UDim.new(0, 4),})
@@ -359,9 +416,18 @@ function blitz.new(name, ...)
 				blitz.tween(Page.Button:FindFirstChildOfClass('ImageLabel'), { ImageColor3 = Color3.fromRGB(125, 125, 125) })
 				blitz.tween(Page.Button:FindFirstChildOfClass('UIStroke'), { Transparency = 1 })
 				blitz.tween(Page.Button:FindFirstChildOfClass('Frame'), { BackgroundTransparency = 1 })
+				
+				Page.Button:SetAttribute('Accent', false)
+				Page.Button:FindFirstChildOfClass('TextLabel'):SetAttribute('Accent', false)
+				Page.Button:FindFirstChildOfClass('ImageLabel'):SetAttribute('Accent', false)
 			end
 
 			TabFrame.Visible = true
+			
+			--@ attributes
+			TabButton:SetAttribute('Accent', true)
+			ButtonText:SetAttribute('Accent', true)
+			ButtonIcon:SetAttribute('Accent', true)
 
 			--@ tweening
 			blitz.tween(TabFrame, { Size = UDim2.new(1, -251, 1, 0) })
@@ -500,13 +566,14 @@ function blitz.new(name, ...)
 				--@ Instance Creation
 				local ElementFrame = blitz.create("Frame", { Parent = SectionContent, Name = [[ElementFrame]], BorderSizePixel = 0, Size = UDim2.new(1, 0, 0, 36), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 				local ElementTitle = blitz.create("TextLabel", { Parent = ElementFrame, Name = [[ElementText]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0, 0.5), TextSize = 20, Size = UDim2.new(1, 0, 1, 0), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[Toggle]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0, 0, 0.5, 0), TextColor3 = Color3.fromRGB(175, 175, 175), BackgroundTransparency = 1,})
-				local ElementButton = blitz.create("TextButton", { Parent = ElementFrame, Name = [[ElementButton]], BorderSizePixel = 0, AutoButtonColor = false, BackgroundColor3 = blitz.accent, AnchorPoint = Vector2.new(1, 0.5), TextSize = 14, Size = UDim2.new(0, 44, 0, 20), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[]], Font = Enum.Font.SourceSans, Position = UDim2.new(1, 0, 0.5, 0), TextColor3 = Color3.fromRGB(0, 0, 0),})
+				local ElementButton = blitz.create("TextButton", { Parent = ElementFrame, Name = [[ElementButton]], BorderSizePixel = 0, AutoButtonColor = false, BackgroundColor3 = blitz.accent, AnchorPoint = Vector2.new(1, 0.5), TextSize = 14, Size = UDim2.new(0, 44, 0, 20), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[]], Font = Enum.Font.SourceSans, Position = UDim2.new(1, 0, 0.5, 0), TextColor3 = Color3.fromRGB(0, 0, 0),}, { ["Accent"] = true })
 				local Circle = blitz.create("ImageLabel", { Parent = ElementButton, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(1, 0.5), Size = UDim2.new(1, -6, 1, -6), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(1, 0, 0.5, 0),})
 				blitz.create("UICorner", { Parent = ElementButton, CornerRadius = UDim.new(1, 0),})
 				blitz.create("UICorner", { Parent = Circle, CornerRadius = UDim.new(1, 0),})
 				blitz.create("UIAspectRatioConstraint", { Parent = Circle,})
 				blitz.create("UIPadding", { Parent = ElementButton, PaddingRight = UDim.new(0, 4), PaddingLeft = UDim.new(0, 4),})
-
+				
+				ElementButton:SetAttribute('Accent', Meta.Value)
 				ElementButton.BackgroundColor3 = Meta.Value and blitz.accent or Color3.fromRGB(32, 32, 32)
 				Circle.Position = Meta.Value and UDim2.new(1, 0, 0.5, 0) or UDim2.new(0, 0, 0.5, 0)
 				Circle.AnchorPoint = Meta.Value and Vector2.new(1, 0.5) or Vector2.new(0, 0.5)
@@ -526,13 +593,15 @@ function blitz.new(name, ...)
 
 				ElementButton.MouseButton1Click:Connect(function()
 					Meta.Value = not Meta.Value
+					ElementButton:SetAttribute('Accent', Meta.Value)
 
 					blitz.tween(
-						ElementButton, { BackgroundColor3 = Meta.Value and blitz.accent or Color3.fromRGB(32, 32, 32) }
+						ElementButton, { BackgroundColor3 = Meta.Value and blitz.accent or Color3.fromRGB(32, 32, 32)}
 					)
 
 					blitz.tween(
 						Circle, {
+							BackgroundTransparency = Meta.Value and 0 or 0.75;
 							Position = Meta.Value and UDim2.new(1, 0, 0.5, 0) or UDim2.new(0, 0, 0.5, 0);
 							AnchorPoint = Meta.Value and Vector2.new(1, 0.5) or Vector2.new(0, 0.5)
 						}
@@ -828,22 +897,13 @@ function blitz.new(name, ...)
 				local ElementTitle = blitz.create("TextLabel", { Parent = ElementFrame, Name = [[ElementTitle]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 0), TextSize = 20, Size = UDim2.new(1, 0, 0, 14), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = Meta.Text, FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0.5, 0, 0.360000014, 0), TextColor3 = Color3.fromRGB(175, 175, 175), BackgroundTransparency = 1,})
 				local ElementDescription = blitz.create("TextLabel", { Parent = ElementFrame, Name = [[ElementDescription]], Visible = false, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 1), TextSize = 16, Size = UDim2.new(1, 0, 0, 12), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[Toggle Description]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0.5, 0, 0.779999971, 0), TextColor3 = Color3.fromRGB(100, 100, 100), BackgroundTransparency = 1,})
 				local ElementButton = blitz.create("TextButton", { AutoButtonColor = false; Parent = ElementFrame, Name = [[ElementButton]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(52, 52, 52), AnchorPoint = Vector2.new(1, 0.5), TextSize = 14, Size = UDim2.new(0, 100, 0, 6), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[]], Font = Enum.Font.SourceSans, Position = UDim2.new(1, 0, 0.5, 0), TextColor3 = Color3.fromRGB(0, 0, 0),})
-				local SliderFill = blitz.create("Frame", { Parent = ElementButton, Name = [[SliderFill]], BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundColor3 = blitz.accent,})
+				local SliderFill = blitz.create("Frame", { Parent = ElementButton, Name = [[SliderFill]], BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundColor3 = blitz.accent,}, { ["Accent"] = true })
 				local SliderButton = blitz.create("ImageButton", { Parent = SliderFill, Name = [[SliderButton]], AnchorPoint = Vector2.new(0.5, 0.5), BorderSizePixel = 0, Size = UDim2.new(0, 10, 0, 10), ImageTransparency = 1, BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(1, 0, 0.5, 0), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 				local SliderValue = blitz.create("TextLabel", { Parent = SliderButton, Name = [[SliderValue]], Visible = true, TextTransparency =1; BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 1), TextSize = 12, Size = UDim2.new(0, 10, 0, 10), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[100]], Font = Enum.Font.Gotham, Position = UDim2.new(0.5, 0, 1, -12), TextColor3 = Color3.fromRGB(175, 175, 175), BackgroundTransparency = 1,})
 				blitz.create("UIStroke", { Parent = SliderButton, ApplyStrokeMode = Enum.ApplyStrokeMode.Border, Thickness = 1.5, Color = Color3.fromRGB(12, 12, 12),})
-				blitz.create("UICorner", { 
-					Parent = ElementButton,
-					CornerRadius = UDim.new(1, 0),
-				})
-				blitz.create("UICorner", { 
-					Parent = SliderButton, 
-					CornerRadius = UDim.new(1, 0),
-				})
-				blitz.create("UICorner", { 
-					Parent = SliderFill, 
-					CornerRadius = UDim.new(1, 0),
-				})
+				blitz.create("UICorner", { Parent = ElementButton, CornerRadius = UDim.new(1, 0),})
+				blitz.create("UICorner", { Parent = SliderButton, CornerRadius = UDim.new(1, 0),})
+				blitz.create("UICorner", { Parent = SliderFill, CornerRadius = UDim.new(1, 0),})
 
 				--@ Functions + Connections
 				ElementFrame.MouseEnter:Connect(function()
@@ -925,57 +985,58 @@ function blitz.new(name, ...)
 				local ElementButton = blitz.create("TextButton", { Parent = ElementFrame, Name = [[ElementButton]], ZIndex = 99, BorderSizePixel = 0, AutoButtonColor = false, BackgroundColor3 = Color3.fromRGB(32, 32, 32), AnchorPoint = Vector2.new(1, 0.5), TextSize = 14, Size = UDim2.new(0, 44, 0, 24), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[]], Font = Enum.Font.SourceSans, Position = UDim2.new(1, 0, 0.5, 0), TextColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1,})
 				local ElementDescription = blitz.create("TextLabel", { Parent = ElementFrame, Name = [[ElementDescription]], Visible = false, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 1), TextSize = 16, Size = UDim2.new(1, 0, 0, 12), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[Toggle Description]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0.5, 0, 0.779999971, 0), TextColor3 = Color3.fromRGB(100, 100, 100), BackgroundTransparency = 1,})
 				local ColorCircle = blitz.create("Frame", { Parent = ElementButton, Name = [[Color]], AnchorPoint = Vector2.new(0, 0.5), BorderSizePixel = 0, Size = UDim2.new(1, -4, 1, -4), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0, 0, 0.5, 0), BackgroundColor3 = Meta.Value,})
-				local Icon = blitz.create("ImageLabel", { Parent = ElementButton, Name = [[Icon]], AnchorPoint = Vector2.new(1, 0.5), Image = [[http://www.roblox.com/asset/?id=6031572320]], BorderSizePixel = 0, Size = UDim2.new(1, -4, 1, -4), BorderColor3 = Color3.fromRGB(0, 0, 0), ImageColor3 = Color3.fromRGB(125, 125, 125), Position = UDim2.new(1, 0, 0.5, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
-				blitz.create("UIAspectRatioConstraint", { Parent = Icon, })
-				blitz.create("UICorner", { Parent = Icon, CornerRadius = UDim.new(1, 0),})
-				blitz.create("UIAspectRatioConstraint", { Parent = ColorCircle,})
-				blitz.create("UICorner", {Parent = ColorCircle, CornerRadius = UDim.new(1, 0),})
-
+				local BrushIcon = blitz.create("ImageLabel", { Parent = ElementButton, Name = [[Icon]], AnchorPoint = Vector2.new(1, 0.5), Image = [[http://www.roblox.com/asset/?id=6031572320]], BorderSizePixel = 0, Size = UDim2.new(1, -4, 1, -4), BorderColor3 = Color3.fromRGB(0, 0, 0), ImageColor3 = Color3.fromRGB(125, 125, 125), Position = UDim2.new(1, 0, 0.5, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 				local ColorPicker = blitz.create("Frame", { Parent = nil, Name = [[ColorPicker]], BorderSizePixel = 0, Size = UDim2.new(0, 360, 0, 255), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(1.00000012, 20, 0, 0), BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
-				local UICorner = blitz.create("UICorner", { Parent = ColorPicker, CornerRadius = UDim.new(0, 12),})
 				local RGBMap = blitz.create("ImageLabel", { Parent = ColorPicker, Name = [[RGBMap]], AnchorPoint = Vector2.new(0.5, 0), Image = [[rbxassetid://1433361550]], Size = UDim2.new(0, 340, 0, 172), SliceCenter = Rect.new(10, 10, 90, 90), BorderColor3 = Color3.fromRGB(40, 40, 40), Position = UDim2.new(0.497000009, 0, 0, 25), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 				local Hitbox = blitz.create("TextButton", { Parent = RGBMap, Name = [[Hitbox]], ZIndex = 99, BackgroundColor3 = Color3.fromRGB(255, 255, 255), TextSize = 14, Size = UDim2.new(1, 0, 1, 0), TextTransparency = 1, TextColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1,})
 				local Marker = blitz.create("Frame", { Parent = RGBMap, Name = [[Marker]], AnchorPoint = Vector2.new(0.5, 0.5), ZIndex = 5, BorderSizePixel = 0, Size = UDim2.new(0, 5, 0, 5), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundColor3 = Color3.fromRGB(255, 16, 231),})
-				local UICorner2 = blitz.create("UICorner", { Parent = Marker, CornerRadius = UDim.new(1, 0),})
-				local UIStroke = blitz.create("UIStroke", { Parent = Marker, Color = Color3.fromRGB(255, 255, 255),})
-				local UICorner3 = blitz.create("UICorner", { Parent = RGBMap, CornerRadius = UDim.new(0, 4),})
 				local TitleLabel = blitz.create("TextLabel", { Parent = ColorPicker, Name = [[TitleLabel]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), TextSize = 17, Size = UDim2.new(0, 351, 0, 12), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = `Color Picker ({Meta.Text})`, FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0.0250000004, 0, 0.0313725509, 0), TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1,})
 				local PreviewFrame = blitz.create("Frame", { Parent = ColorPicker, Name = [[PreviewFrame]], ZIndex = 999, BorderSizePixel = 0, Size = UDim2.new(0, 54, 0, 16), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0, 9, 0, 203), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
-				local UICorner4 = blitz.create("UICorner", { Parent = PreviewFrame, CornerRadius = UDim.new(0, 4),})
 				local CheckerPattern = blitz.create("ImageLabel", { Parent = PreviewFrame, Name = [[CheckerPattern]], AnchorPoint = Vector2.new(0.5, 0.5), Image = [[rbxassetid://14727168439]], TileSize = UDim2.new(0.340000004, 0, 0.699999988, 0), BorderSizePixel = 0, Size = UDim2.new(1.00000012, 0, 1, 0), ScaleType = Enum.ScaleType.Tile, BorderColor3 = Color3.fromRGB(0, 0, 0), ImageTransparency = 1, ImageColor3 = Color3.fromRGB(12, 12, 12), Position = UDim2.new(0.50000006, 0, 0.5, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
-				local UICorner5 = blitz.create("UICorner", { Parent = CheckerPattern, CornerRadius = UDim.new(0, 4),})
 				local RedInput = blitz.create("TextBox", { Parent = ColorPicker, Name = [[RedInput]], CursorPosition = -1, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(22, 22, 22), TextXAlignment = Enum.TextXAlignment.Right, TextSize = 20, Size = UDim2.new(0.330000013, -8, 0, 22), TextColor3 = Color3.fromRGB(150, 150, 150), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[999]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0, 8, 0, 225), ClearTextOnFocus = false,})
-				local UICorner6 = blitz.create("UICorner", { Parent = RedInput, CornerRadius = UDim.new(0, 4),})
-				local UIPadding = blitz.create("UIPadding", { Parent = RedInput, PaddingRight = UDim.new(0, 10), PaddingLeft = UDim.new(0, 10),})
 				local TextLabel = blitz.create("TextLabel", { Parent = RedInput, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), TextSize = 20, Size = UDim2.new(0, 41, 0, 22), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[R]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1,})
 				local Frame = blitz.create("Frame", { Parent = RedInput, BorderSizePixel = 0, Size = UDim2.new(0, 1, 0, 22), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0, 16, 0, 0), BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
 				local GreenInput = blitz.create("TextBox", { Parent = ColorPicker, Name = [[GreenInput]], CursorPosition = -1, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(22, 22, 22), TextXAlignment = Enum.TextXAlignment.Right, TextSize = 20, Size = UDim2.new(0.330000013, -8, 0, 22), TextColor3 = Color3.fromRGB(150, 150, 150), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[999]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0, 123, 0, 225), ClearTextOnFocus = false,})
-				local UICorner7 = blitz.create("UICorner", { Parent = GreenInput, CornerRadius = UDim.new(0, 4),})
-				local UIPadding2 = blitz.create("UIPadding", { Parent = GreenInput, PaddingRight = UDim.new(0, 10), PaddingLeft = UDim.new(0, 10),})
 				local TextLabel2 = blitz.create("TextLabel", { Parent = GreenInput, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), TextSize = 20, Size = UDim2.new(0, 41, 0, 22), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[G]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1,})
 				local Frame2 = blitz.create("Frame", { Parent = GreenInput, BorderSizePixel = 0, Size = UDim2.new(0, 1, 0, 22), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0, 16, 0, 0), BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
 				local BlueInput = blitz.create("TextBox", { Parent = ColorPicker, Name = [[BlueInput]], CursorPosition = -1, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(22, 22, 22), TextXAlignment = Enum.TextXAlignment.Right, TextSize = 20, Size = UDim2.new(0.330000013, -8, 0, 22), TextColor3 = Color3.fromRGB(150, 150, 150), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[999]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0, 238, 0, 225), ClearTextOnFocus = false,})
-				local UICorner8 = blitz.create("UICorner", { Parent = BlueInput, CornerRadius = UDim.new(0, 4),})
-				local UIPadding3 = blitz.create("UIPadding", { Parent = BlueInput, PaddingRight = UDim.new(0, 10), PaddingLeft = UDim.new(0, 10),})
 				local TextLabel3 = blitz.create("TextLabel", { Parent = BlueInput, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), TextSize = 20, Size = UDim2.new(0, 41, 0, 22), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[B]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1,})
 				local Frame3 = blitz.create("Frame", { Parent = BlueInput, BorderSizePixel = 0, Size = UDim2.new(0, 1, 0, 22), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0, 16, 0, 0), BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
 				local ValueSlider = blitz.create("Frame", { Parent = ColorPicker, Name = [[ValueSlider]], BorderSizePixel = 0, Size = UDim2.new(0, 280, 0, 6), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0, 69, 0, 203), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
-				local UICorner9 = blitz.create("UICorner", { Parent = ValueSlider, CornerRadius = UDim.new(1, 0),})
-				local UIGradient = blitz.create("UIGradient", { Parent = ValueSlider, Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)); ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255));}),})
 				local Fill = blitz.create("Frame", { Parent = ValueSlider, Name = [[Fill]], BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 				local Marker2 = blitz.create("ImageButton", { Parent = Fill, Name = [[Marker]], AnchorPoint = Vector2.new(0.5, 0.5), Image = [[rbxasset://textures/ui/GuiImagePlaceholder.png]], BorderSizePixel = 0, Size = UDim2.new(0, 6, 0, 6), ImageTransparency = 1, BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(1, 0, 0.5, 0), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
-				local UIStroke2 = blitz.create("UIStroke", { Parent = Marker2,})
-				local UICorner10 = blitz.create("UICorner", { Parent = Marker2, CornerRadius = UDim.new(1, 0),})
 				local AlphaSlider = blitz.create("Frame", { Parent = ColorPicker, Name = [[AlphaSlider]], BorderSizePixel = 0, Size = UDim2.new(0, 280, 0, 6), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0, 69, 0, 213), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
-				local UICorner11 = blitz.create("UICorner", { Parent = AlphaSlider, CornerRadius = UDim.new(1, 0),})
 				local Fill2 = blitz.create("Frame", { Parent = AlphaSlider, Name = [[Fill]], BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 				local Marker3 = blitz.create("ImageButton", { Parent = Fill2, Name = [[Marker]], AnchorPoint = Vector2.new(0.5, 0.5), Image = [[rbxasset://textures/ui/GuiImagePlaceholder.png]], BorderSizePixel = 0, Size = UDim2.new(0, 6, 0, 6), ImageTransparency = 1, BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(1, 0, 0.5, 0), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
-				local UIStroke3 = blitz.create("UIStroke", { Parent = Marker3,})
-				local UICorner12 = blitz.create("UICorner", { Parent = Marker3, CornerRadius = UDim.new(1, 0),})
-				local CheckerPattern2 = blitz.create("ImageLabel", { Parent = AlphaSlider, Name = [[CheckerPattern]], AnchorPoint = Vector2.new(0.5, 0.5), Image = [[rbxassetid://14727168439]], TileSize = UDim2.new(0.0250000004, 0, 1, 0), ZIndex = 0, BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), ScaleType = Enum.ScaleType.Tile, BorderColor3 = Color3.fromRGB(0, 0, 0), ImageColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
-				local UICorner13 = blitz.create("UICorner", { Parent = CheckerPattern2, CornerRadius = UDim.new(1, 0),})
-				local UIGradient2 = blitz.create("UIGradient", { Parent = CheckerPattern2, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0, 0); NumberSequenceKeypoint.new(1, 1, 0);}),})
-
+				local CheckerPattern2 = blitz.create("ImageLabel", { Parent = AlphaSlider, Name = [[CheckerPattern]], AnchorPoint = Vector2.new(0.5, 0.5), Image = [[rbxassetid://14727168439]], ImageTransparency = 1, TileSize = UDim2.new(0.0250000004, 0, 1, 0), ZIndex = 0, BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), ScaleType = Enum.ScaleType.Tile, BorderColor3 = Color3.fromRGB(0, 0, 0), ImageColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
+				local CloseButton = blitz.create("TextButton", { Parent = ColorPicker, Name = [[CloseButton]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(1, 0), TextSize = 14, Size = UDim2.new(0, 28, 0, 24), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[x]], Font = Enum.Font.Michroma, Position = UDim2.new(1, 0, 0, 0), TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1,})
+				
+				blitz.create("UIStroke", { Parent = Marker, Color = Color3.fromRGB(255, 255, 255),})
+				blitz.create("UIStroke", { Parent = Marker2,})
+				blitz.create("UIStroke", { Parent = Marker3,})
+				blitz.create("UICorner", { Parent = ColorPicker, CornerRadius = UDim.new(0, 12),})
+				blitz.create("UICorner", { Parent = Marker, CornerRadius = UDim.new(1, 0),})
+				blitz.create("UICorner", { Parent = RGBMap, CornerRadius = UDim.new(0, 4),})
+				blitz.create("UICorner", { Parent = PreviewFrame, CornerRadius = UDim.new(0, 4),})
+				blitz.create("UICorner", { Parent = CheckerPattern, CornerRadius = UDim.new(0, 4),})
+				blitz.create("UICorner", { Parent = RedInput, CornerRadius = UDim.new(0, 4),})
+				blitz.create("UICorner", { Parent = GreenInput, CornerRadius = UDim.new(0, 4),})
+				blitz.create("UICorner", { Parent = BlueInput, CornerRadius = UDim.new(0, 4),})
+				blitz.create("UICorner", { Parent = ValueSlider, CornerRadius = UDim.new(1, 0),})
+				blitz.create("UICorner", { Parent = Marker2, CornerRadius = UDim.new(1, 0),})
+				blitz.create("UICorner", { Parent = AlphaSlider, CornerRadius = UDim.new(1, 0),})
+				blitz.create("UICorner", { Parent = Marker3, CornerRadius = UDim.new(1, 0),})
+				blitz.create("UICorner", { Parent = CheckerPattern2, CornerRadius = UDim.new(1, 0),})
+				blitz.create("UICorner", { Parent = BrushIcon, CornerRadius = UDim.new(1, 0),})
+				blitz.create("UICorner", {Parent = ColorCircle, CornerRadius = UDim.new(1, 0),})
+				blitz.create("UIPadding", { Parent = RedInput, PaddingRight = UDim.new(0, 10), PaddingLeft = UDim.new(0, 10),})
+				blitz.create("UIPadding", { Parent = GreenInput, PaddingRight = UDim.new(0, 10), PaddingLeft = UDim.new(0, 10),})
+				blitz.create("UIPadding", { Parent = BlueInput, PaddingRight = UDim.new(0, 10), PaddingLeft = UDim.new(0, 10),})
+				blitz.create("UIGradient", { Parent = ValueSlider, Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)); ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255));}),})
+				blitz.create("UIGradient", { Parent = CheckerPattern2, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0, 0); NumberSequenceKeypoint.new(1, 1, 0);}),})
+				blitz.create("UIAspectRatioConstraint", { Parent = BrushIcon, })
+				blitz.create("UIAspectRatioConstraint", { Parent = ColorCircle,})
+				
 				--@ Functions + Connections
 				ElementButton.MouseButton1Click:Connect(function()
 					if WindowFrame:FindFirstChild('ColorPicker') then
@@ -984,6 +1045,11 @@ function blitz.new(name, ...)
 
 					Meta.Hidden = not Meta.Hidden
 					ColorPicker.Parent = Meta.Hidden and WindowFrame or blitz.cache
+				end)
+				
+				CloseButton.MouseButton1Click:Connect(function()
+					Meta.Hidden = true
+					ColorPicker.Parent = blitz.cache
 				end)
 
 				local rgb_map = RGBMap
@@ -1029,37 +1095,39 @@ function blitz.new(name, ...)
 					Hue = 0;
 					Sat = 0;
 					Val = 1;
-					Alpha = 1;
+					Alpha = 0;
+					RGB = nil;
 				}
 
 				local function SetColor(...)
 					ColorData = overwrite(ColorData, ... or {})
-
-					Meta.Value = Color3.fromHSV(
-						ColorData.Hue,
-						ColorData.Sat,
-						ColorData.Val
-					)
-
+					
 					Color_RGB = Color3.fromHSV(
 						ColorData.Hue,
 						ColorData.Sat,
 						ColorData.Val
 					)
+					
+					ColorData.RGB = Color3.fromRGB(
+						Color_RGB.R * 255,
+						Color_RGB.G * 255,
+						Color_RGB.B * 255
+					)
 
-					Color.BackgroundColor3 = Color_RGB
-					ColorCircle.BackgroundColor3 = Color_RGB
-					Marker.BackgroundColor3 = Color_RGB
-					ValueSlider.BackgroundColor3 = Color_RGB
-					AlphaSlider.BackgroundColor3 = Color_RGB
+					Color.BackgroundColor3 = ColorData.RGB
+					ColorCircle.BackgroundColor3 = ColorData.RGB
+					Marker.BackgroundColor3 = ColorData.RGB
+					ValueSlider.BackgroundColor3 = ColorData.RGB
+					AlphaSlider.BackgroundColor3 = ColorData.RGB
 					RedInput.Text = math.round(Color_RGB.R * 255)
 					GreenInput.Text = math.round(Color_RGB.G * 255)
 					BlueInput.Text = math.round(Color_RGB.B * 255)
-					Color.CheckerPattern.ImageTransparency = ColorData.Alpha
+					Color.CheckerPattern.ImageTransparency = 1 - ColorData.Alpha
 
 					if ColorData.Sat < .25 then tween(Marker.UIStroke, {Color = Color3.fromHSV(0,0,0)}, TweenInfo.new(.15)) end
 					if ColorData.Sat > .25 then tween(Marker.UIStroke, {Color = Color3.fromHSV(0,0,1)}, TweenInfo.new(.15)) end
 
+					Meta.Value = ColorData
 					Meta.OnUpdate(Meta.Value)
 				end
 
@@ -1109,7 +1177,7 @@ function blitz.new(name, ...)
 				Hitbox.MouseButton1Down:Connect(function() mouse_down = true end)
 
 				-- >> Value Slider Control
-				local ValueSlider =ValueSlider
+				local ValueSlider = ValueSlider
 				local ValueFill = ValueSlider.Fill
 				local ValueMarker = ValueFill.Marker
 
@@ -1135,11 +1203,9 @@ function blitz.new(name, ...)
 
 					if ValueMeta.Dec then
 						ValueMeta.Value = (math.clamp((mouse_x / ValueSlider.AbsoluteSize.X) * (Max - Min) + Min, Min, Max))
-						print(tostring(ValueMeta.Value))
 						SetColor({ Val = ValueMeta.Value})
 					elseif not ValueMeta.Dec then
 						ValueMeta.Value = math.floor(math.clamp((mouse_x / ValueSlider.AbsoluteSize.X) * (Max - Min) + Min, Min, Max))
-						print(ValueMeta.Value)
 						SetColor({ Val = ValueMeta.Value})
 					end
 
@@ -1172,6 +1238,7 @@ function blitz.new(name, ...)
 					Min = 0;
 					Max = 1;
 					Value = 1;
+					Inversed = 0;
 					OnUpdate = function(...) end,
 				}
 
@@ -1187,12 +1254,10 @@ function blitz.new(name, ...)
 
 					if AlphaMeta.Dec then
 						AlphaMeta.Value = (math.clamp((mouse_x / AlphaSlider.AbsoluteSize.X) * (Max - Min) + Min, Min, Max))
-						--print(tostring(AlphaMeta.Value))
-						SetColor({ Alpha = AlphaMeta.Value})
+						SetColor({ Alpha = 1 - AlphaMeta.Value})
 					elseif not AlphaMeta.Dec then
 						AlphaMeta.Value = math.floor(math.clamp((mouse_x / AlphaSlider.AbsoluteSize.X) * (Max - Min) + Min, Min, Max))
-						--print(AlphaMeta.Value)
-						SetColor({ Alpha = AlphaMeta.Value})
+						SetColor({ Alpha = 1 - AlphaMeta.Value})
 					end
 
 					AlphaFill.Size = UDim2.new((AlphaMeta.Value - Min) / (Max - Min), 0, 1, 0)
