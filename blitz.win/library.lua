@@ -1,5 +1,5 @@
---@ doom.dtw | blitz.win | v1.0.5
---@ patch: polished
+--@ doom.dtw | blitz.win | v1.0.6
+--@ patch: remade color picker
 
 --@ dependancies
 cloneref = cloneref or function(...) return ... end
@@ -927,116 +927,297 @@ function blitz.new(name, ...)
 				local ElementDescription = blitz.create("TextLabel", { Parent = ElementFrame, Name = [[ElementDescription]], Visible = false, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 1), TextSize = 16, Size = UDim2.new(1, 0, 0, 12), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[Toggle Description]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0.5, 0, 0.779999971, 0), TextColor3 = Color3.fromRGB(100, 100, 100), BackgroundTransparency = 1,})
 				local Color = blitz.create("Frame", { Parent = ElementButton, Name = [[Color]], AnchorPoint = Vector2.new(0, 0.5), BorderSizePixel = 0, Size = UDim2.new(1, -4, 1, -4), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0, 0, 0.5, 0), BackgroundColor3 = Meta.Value,})
 				local Icon = blitz.create("ImageLabel", { Parent = ElementButton, Name = [[Icon]], AnchorPoint = Vector2.new(1, 0.5), Image = [[http://www.roblox.com/asset/?id=6031572320]], BorderSizePixel = 0, Size = UDim2.new(1, -4, 1, -4), BorderColor3 = Color3.fromRGB(0, 0, 0), ImageColor3 = Color3.fromRGB(125, 125, 125), Position = UDim2.new(1, 0, 0.5, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
-				local ColorPicker = blitz.create("Frame", { Parent = ElementButton, Name = [[ColorPicker]], AnchorPoint = Vector2.new(1, 0), Visible = false; ZIndex = 99, BorderSizePixel = 0, Size = UDim2.new(0, 152, 0, 138), BorderColor3 = Color3.fromRGB(76, 76, 76), Position = UDim2.new(1, 0, 0, 28), BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
-				local rgb_map = blitz.create("ImageLabel", { Parent = ColorPicker, Name = [[rgb_map]], AnchorPoint = Vector2.new(0, 0.5), Image = [[rbxassetid://1433361550]], ZIndex = 4, Size = UDim2.new(0, 112, 0, 122), SliceCenter = Rect.new(10, 10, 90, 90), BorderColor3 = Color3.fromRGB(40, 40, 40), Position = UDim2.new(0.0079984162, 6, 0.500647068, 0), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
-				local Hitbox = blitz.create("TextButton", { Parent = rgb_map, Name = [[Hitbox]], BackgroundColor3 = Color3.fromRGB(255, 255, 255), TextSize = 14, Size = UDim2.new(0, 200, 0, 50), TextTransparency = 1, TextColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1,})
-				local Marker = blitz.create("Frame", { Parent = rgb_map, Name = [[Marker]], AnchorPoint = Vector2.new(0.5, 0.5), ZIndex = 5, BorderSizePixel = 0, Size = UDim2.new(0, 5, 0, 5), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
-				local value_map = blitz.create("ImageLabel", { Parent = ColorPicker, Name = [[value_map]], AnchorPoint = Vector2.new(0, 0.5), Image = [[rbxassetid://359311684]], ZIndex = 4, Size = UDim2.new(0, 17, 0, 122), SliceCenter = Rect.new(10, 10, 90, 90), BorderColor3 = Color3.fromRGB(40, 40, 40), ImageColor3 = Color3.fromRGB(255, 0, 0), Position = UDim2.new(0.239034951, 91, 0.498985171, 0), BackgroundColor3 = Color3.fromRGB(0, 0, 0),})
-				local Marker2 = blitz.create("Frame", { Parent = value_map, Name = [[Marker]], AnchorPoint = Vector2.new(0.5, 1), ZIndex = 5, Size = UDim2.new(1, 2, 0, 1), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0.5, 0, 0, 1), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
-				blitz.create("UIAspectRatioConstraint", { 
-					Parent = Icon,
-				})
-				blitz.create("UICorner", { 
-					Parent = Icon, 
-					CornerRadius = UDim.new(1, 0),
-				})
-				blitz.create("UIAspectRatioConstraint", { 
-					Parent = Color,
-				})
-				blitz.create("UICorner", { 
-					Parent = Color, 
-					CornerRadius = UDim.new(1, 0),
-				})
-				blitz.create("UICorner", { Parent = value_map, 
-					CornerRadius = UDim.new(0, 4),
-				})
-				blitz.create("UICorner", { 
-					Parent = ColorPicker, 
-					CornerRadius = UDim.new(0, 4),
-				})
-				blitz.create("UIStroke", { 
-					Parent = ColorPicker, 
-					Color = Color3.fromRGB(32, 32, 32),
-				})
-				blitz.create("UICorner", { 
-					Parent = Marker, 
-					CornerRadius = 
-						UDim.new(1, 0),}
-				)
-				blitz.create("UIStroke", { 
-					Parent = Marker, 
-					Transparency = 0,}
-				)
-				blitz.create("UICorner", { 
-					Parent = rgb_map, 
-					CornerRadius = UDim.new(0, 4),}
-				)
+				blitz.create("UIAspectRatioConstraint", { Parent = Icon, })
+				blitz.create("UICorner", { Parent = Icon, CornerRadius = UDim.new(1, 0),})
+				blitz.create("UIAspectRatioConstraint", { Parent = Color,})
+				blitz.create("UICorner", {Parent = Color, CornerRadius = UDim.new(1, 0),})
+				blitz.create("UICorner", { Parent = value_map, CornerRadius = UDim.new(0, 4),})
+				blitz.create("UICorner", { Parent = ColorPicker, CornerRadius = UDim.new(0, 4),})
+				blitz.create("UIStroke", { Parent = ColorPicker, Color = Color3.fromRGB(32, 32, 32),})
+				blitz.create("UICorner", { Parent = rgb_map, CornerRadius = UDim.new(0, 4),})
+
+				local ColorPicker = blitz.create("Frame", { Parent = nil, Name = [[ColorPicker]], BorderSizePixel = 0, Size = UDim2.new(0, 360, 0, 255), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(1.00000012, 20, 0, 0), BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
+				local UICorner = blitz.create("UICorner", { Parent = ColorPicker, CornerRadius = UDim.new(0, 12),})
+				local RGBMap = blitz.create("ImageLabel", { Parent = ColorPicker, Name = [[RGBMap]], AnchorPoint = Vector2.new(0.5, 0), Image = [[rbxassetid://1433361550]], Size = UDim2.new(0, 340, 0, 172), SliceCenter = Rect.new(10, 10, 90, 90), BorderColor3 = Color3.fromRGB(40, 40, 40), Position = UDim2.new(0.497000009, 0, 0, 25), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
+				local Hitbox = blitz.create("TextButton", { Parent = RGBMap, Name = [[Hitbox]], ZIndex = 99, BackgroundColor3 = Color3.fromRGB(255, 255, 255), TextSize = 14, Size = UDim2.new(1, 0, 1, 0), TextTransparency = 1, TextColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1,})
+				local Marker = blitz.create("Frame", { Parent = RGBMap, Name = [[Marker]], AnchorPoint = Vector2.new(0.5, 0.5), ZIndex = 5, BorderSizePixel = 0, Size = UDim2.new(0, 5, 0, 5), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundColor3 = Color3.fromRGB(255, 16, 231),})
+				local UICorner2 = blitz.create("UICorner", { Parent = Marker, CornerRadius = UDim.new(1, 0),})
+				local UIStroke = blitz.create("UIStroke", { Parent = Marker, Color = Color3.fromRGB(255, 255, 255),})
+				local UICorner3 = blitz.create("UICorner", { Parent = RGBMap, CornerRadius = UDim.new(0, 4),})
+				local TitleLabel = blitz.create("TextLabel", { Parent = ColorPicker, Name = [[TitleLabel]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), TextSize = 17, Size = UDim2.new(0, 351, 0, 12), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = `Color Picker {Meta.Text}`, FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0.0250000004, 0, 0.0313725509, 0), TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1,})
+				local PreviewFrame = blitz.create("Frame", { Parent = ColorPicker, Name = [[PreviewFrame]], ZIndex = 999, BorderSizePixel = 0, Size = UDim2.new(0, 54, 0, 16), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0, 9, 0, 203), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
+				local UICorner4 = blitz.create("UICorner", { Parent = PreviewFrame, CornerRadius = UDim.new(0, 4),})
+				local CheckerPattern = blitz.create("ImageLabel", { Parent = PreviewFrame, Name = [[CheckerPattern]], AnchorPoint = Vector2.new(0.5, 0.5), Image = [[rbxassetid://14727168439]], TileSize = UDim2.new(0.340000004, 0, 0.699999988, 0), BorderSizePixel = 0, Size = UDim2.new(1.00000012, 0, 1, 0), ScaleType = Enum.ScaleType.Tile, BorderColor3 = Color3.fromRGB(0, 0, 0), ImageTransparency = 1, ImageColor3 = Color3.fromRGB(12, 12, 12), Position = UDim2.new(0.50000006, 0, 0.5, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
+				local UICorner5 = blitz.create("UICorner", { Parent = CheckerPattern, CornerRadius = UDim.new(0, 4),})
+				local RedInput = blitz.create("TextBox", { Parent = ColorPicker, Name = [[RedInput]], CursorPosition = -1, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(22, 22, 22), TextXAlignment = Enum.TextXAlignment.Right, TextSize = 20, Size = UDim2.new(0.330000013, -8, 0, 22), TextColor3 = Color3.fromRGB(150, 150, 150), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[999]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0, 8, 0, 225), ClearTextOnFocus = false,})
+				local UICorner6 = blitz.create("UICorner", { Parent = RedInput, CornerRadius = UDim.new(0, 4),})
+				local UIPadding = blitz.create("UIPadding", { Parent = RedInput, PaddingRight = UDim.new(0, 10), PaddingLeft = UDim.new(0, 10),})
+				local TextLabel = blitz.create("TextLabel", { Parent = RedInput, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), TextSize = 20, Size = UDim2.new(0, 41, 0, 22), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[R]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1,})
+				local Frame = blitz.create("Frame", { Parent = RedInput, BorderSizePixel = 0, Size = UDim2.new(0, 1, 0, 22), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0, 16, 0, 0), BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
+				local GreenInput = blitz.create("TextBox", { Parent = ColorPicker, Name = [[GreenInput]], CursorPosition = -1, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(22, 22, 22), TextXAlignment = Enum.TextXAlignment.Right, TextSize = 20, Size = UDim2.new(0.330000013, -8, 0, 22), TextColor3 = Color3.fromRGB(150, 150, 150), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[999]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0, 123, 0, 225), ClearTextOnFocus = false,})
+				local UICorner7 = blitz.create("UICorner", { Parent = GreenInput, CornerRadius = UDim.new(0, 4),})
+				local UIPadding2 = blitz.create("UIPadding", { Parent = GreenInput, PaddingRight = UDim.new(0, 10), PaddingLeft = UDim.new(0, 10),})
+				local TextLabel2 = blitz.create("TextLabel", { Parent = GreenInput, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), TextSize = 20, Size = UDim2.new(0, 41, 0, 22), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[G]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1,})
+				local Frame2 = blitz.create("Frame", { Parent = GreenInput, BorderSizePixel = 0, Size = UDim2.new(0, 1, 0, 22), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0, 16, 0, 0), BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
+				local BlueInput = blitz.create("TextBox", { Parent = ColorPicker, Name = [[BlueInput]], CursorPosition = -1, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(22, 22, 22), TextXAlignment = Enum.TextXAlignment.Right, TextSize = 20, Size = UDim2.new(0.330000013, -8, 0, 22), TextColor3 = Color3.fromRGB(150, 150, 150), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[999]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0, 238, 0, 225), ClearTextOnFocus = false,})
+				local UICorner8 = blitz.create("UICorner", { Parent = BlueInput, CornerRadius = UDim.new(0, 4),})
+				local UIPadding3 = blitz.create("UIPadding", { Parent = BlueInput, PaddingRight = UDim.new(0, 10), PaddingLeft = UDim.new(0, 10),})
+				local TextLabel3 = blitz.create("TextLabel", { Parent = BlueInput, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), TextSize = 20, Size = UDim2.new(0, 41, 0, 22), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[B]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1,})
+				local Frame3 = blitz.create("Frame", { Parent = BlueInput, BorderSizePixel = 0, Size = UDim2.new(0, 1, 0, 22), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0, 16, 0, 0), BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
+				local ValueSlider = blitz.create("Frame", { Parent = ColorPicker, Name = [[ValueSlider]], BorderSizePixel = 0, Size = UDim2.new(0, 280, 0, 6), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0, 69, 0, 203), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
+				local UICorner9 = blitz.create("UICorner", { Parent = ValueSlider, CornerRadius = UDim.new(1, 0),})
+				local UIGradient = blitz.create("UIGradient", { Parent = ValueSlider, Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)); ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255));}),})
+				local Fill = blitz.create("Frame", { Parent = ValueSlider, Name = [[Fill]], BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
+				local Marker2 = blitz.create("ImageButton", { Parent = Fill, Name = [[Marker]], AnchorPoint = Vector2.new(0.5, 0.5), Image = [[rbxasset://textures/ui/GuiImagePlaceholder.png]], BorderSizePixel = 0, Size = UDim2.new(0, 6, 0, 6), ImageTransparency = 1, BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(1, 0, 0.5, 0), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
+				local UIStroke2 = blitz.create("UIStroke", { Parent = Marker2,})
+				local UICorner10 = blitz.create("UICorner", { Parent = Marker2, CornerRadius = UDim.new(1, 0),})
+				local AlphaSlider = blitz.create("Frame", { Parent = ColorPicker, Name = [[AlphaSlider]], BorderSizePixel = 0, Size = UDim2.new(0, 280, 0, 6), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0, 69, 0, 213), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
+				local UICorner11 = blitz.create("UICorner", { Parent = AlphaSlider, CornerRadius = UDim.new(1, 0),})
+				local Fill2 = blitz.create("Frame", { Parent = AlphaSlider, Name = [[Fill]], BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
+				local Marker3 = blitz.create("ImageButton", { Parent = Fill2, Name = [[Marker]], AnchorPoint = Vector2.new(0.5, 0.5), Image = [[rbxasset://textures/ui/GuiImagePlaceholder.png]], BorderSizePixel = 0, Size = UDim2.new(0, 6, 0, 6), ImageTransparency = 1, BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(1, 0, 0.5, 0), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
+				local UIStroke3 = blitz.create("UIStroke", { Parent = Marker3,})
+				local UICorner12 = blitz.create("UICorner", { Parent = Marker3, CornerRadius = UDim.new(1, 0),})
+				local CheckerPattern2 = blitz.create("ImageLabel", { Parent = AlphaSlider, Name = [[CheckerPattern]], AnchorPoint = Vector2.new(0.5, 0.5), Image = [[rbxassetid://14727168439]], TileSize = UDim2.new(0.0250000004, 0, 1, 0), ZIndex = 0, BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), ScaleType = Enum.ScaleType.Tile, BorderColor3 = Color3.fromRGB(0, 0, 0), ImageColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
+				local UICorner13 = blitz.create("UICorner", { Parent = CheckerPattern2, CornerRadius = UDim.new(1, 0),})
+				local UIGradient2 = blitz.create("UIGradient", { Parent = CheckerPattern2, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0, 0); NumberSequenceKeypoint.new(1, 1, 0);}),})
 
 				--@ Functions + Connections
 				ElementButton.MouseButton1Click:Connect(function()
-					ColorPicker.Visible = not ColorPicker.Visible
-					ElementFrame.ZIndex = ColorPicker.Visible and 99 or 0
-					SectionFrame.ZIndex = ColorPicker.Visible and 99 or 0
+					if WindowFrame:FindFirstChild('ColorPicker') then
+						WindowFrame.ColorPicker.Parent = nil
+					end
+						
+					Meta.Hidden = not Meta.Hidden
+					ColorPicker.Parent = Meta.Hidden and nil or WindowFrame
 				end)
 
+				local rgb_map = RGBMap
+				local value_map = ValueSlider
+				local Color = PreviewFrame
+				
+				local Hitbox = rgb_map.Hitbox
+				local Marker = rgb_map.Marker
+				--local Marker2 = value_map.Marker
+				
+				local RedInput = RedInput
+				local GreenInput = GreenInput
+				local BlueInput = BlueInput
+				
 				local Player = Services.Players.LocalPlayer
 				local Mouse = Player:GetMouse()
-
+				
 				local mouse_down = false
-				local current_color_h, current_color_s, current_color_v = Meta.Value:ToHSV()
-				local current_color = Color3.fromHSV(current_color_h, current_color_s, current_color_v)
-
-				local color_data = {
-					current_color_h,
-					current_color_s,
-					current_color_v,
+				
+				local function tween(instance : Instance, meta : {}, info : TweenInfo)
+					game.TweenService:Create(
+						instance,
+						info or TweenInfo.new(.25, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
+						meta
+					):Play()
+				end;
+				
+				local function overwrite(T1 : {}, T2 : {})
+					for i, v in pairs(T2) do
+						if type(v) == 'table' then
+							T1[i] = overwrite(T1[i] or {}, v)
+						else
+							T1[i] = v
+						end
+					end
+				
+					return T1 or nil
+				end;
+				
+				local Color_H, Color_S, Color_V = Meta.Value:ToHSV()
+				local Color_RGB = Color3.fromHSV(Color_H, Color_S, Color_V)
+				local ColorData = {
+					Hue = 0;
+					Sat = 0;
+					Val = 1;
+					Alpha = 1;
 				}
-
-				local function set_color(hue,sat,val)
-					color_data = {hue or color_data[1],sat or color_data[2],val or color_data[3]}
-
-					Meta.Value = Color3.fromHSV(color_data[1], color_data[2], color_data[3])
-					current_color = Color3.fromHSV(color_data[1],color_data[2],color_data[3])
-					value_map.ImageColor3 = Color3.fromHSV(color_data[1],color_data[2],1)
-
-					Color.BackgroundColor3 = current_color
-
+				
+				local function SetColor(...)
+					ColorData = overwrite(ColorData, ... or {})
+					
+					print(ColorData)
+					
+					Meta.Value = Color3.fromHSV(
+						ColorData.Hue,
+						ColorData.Sat,
+						ColorData.Val
+					)
+					
+					Color_RGB = Color3.fromHSV(
+						ColorData.Hue,
+						ColorData.Sat,
+						ColorData.Val
+					)
+				
+					Color.BackgroundColor3 = Color_RGB
+					Marker.BackgroundColor3 = Color_RGB
+					script.Parent.ValueSlider.BackgroundColor3 = Color_RGB
+					script.Parent.AlphaSlider.BackgroundColor3 = Color_RGB
+					RedInput.Text = math.round(Color_RGB.R * 255)
+					GreenInput.Text = math.round(Color_RGB.G * 255)
+					BlueInput.Text = math.round(Color_RGB.B * 255)
+					Color.CheckerPattern.ImageTransparency = ColorData.Alpha
+				
+					if ColorData.Sat < .25 then tween(Marker.UIStroke, {Color = Color3.fromHSV(0,0,0)}, TweenInfo.new(.15)) end
+					if ColorData.Sat > .25 then tween(Marker.UIStroke, {Color = Color3.fromHSV(0,0,1)}, TweenInfo.new(.15)) end
+					
 					Meta.OnUpdate(Meta.Value)
 				end
-
-				local function in_bounds(i)
+				
+				local function InBounds(i)
 					local x, y = Mouse.X - i.AbsolutePosition.X, Mouse.Y - i.AbsolutePosition.Y
 					local max_x, max_y = i.AbsoluteSize.X, i.AbsoluteSize.Y
-
+				
 					if x >= 0 and y >= 0 and x <= max_x and y <= max_y then
 						return x/max_x,y/max_y
 					end
 				end
-
+				
 				local function update_rgb()
 					if mouse_down then
-						local x,y = in_bounds(rgb_map)
+						local x,y = InBounds(rgb_map)
 						if x and y then
 							Marker.Position = UDim2.new(x,0,y,0)
-							set_color(1 - x,1 - y)
+							SetColor({ Hue = 1 - x, Sat = 1 - y})
 						end
-
-						local x,y = in_bounds(value_map)
+				
+						local x,y = InBounds(value_map)
 						if x and y then
-							Marker2.Position = UDim2.new(0.5,0,y,0)
-							set_color(nil,nil,1 - y)
+							script.Parent.ValueSlider.Fill.Marker.Position = UDim2.new(0.5,0,y,0)
+							SetColor({ Val = 1 - y})
 						end
 					end
 				end
-
+				
+				Color.BackgroundColor3 = Color_RGB
+				Marker.BackgroundColor3 = Color_RGB
+				script.Parent.ValueSlider.BackgroundColor3 = Color_RGB
+				script.Parent.AlphaSlider.BackgroundColor3 = Color_RGB
+				RedInput.Text = math.round(Color_RGB.R * 255)
+				GreenInput.Text = math.round(Color_RGB.G * 255)
+				BlueInput.Text = math.round(Color_RGB.B * 255)
+				Color.CheckerPattern.ImageTransparency = ColorData.Alpha
+				
 				update_rgb()
-
+				local x,y = InBounds(rgb_map)
+				Marker.Position = UDim2.new(x,0,y,0)
+				
+				Mouse.Move:Connect(function() update_rgb() end)
+				
 				rgb_map.MouseLeave:Connect(function() mouse_down = false end)
 				value_map.MouseLeave:Connect(function() mouse_down = false end)
 				Hitbox.MouseButton1Up:Connect(function() mouse_down = false end)
 				Hitbox.MouseButton1Down:Connect(function() mouse_down = true end)
+				
+				-- >> Value Slider Control
+				local ValueSlider = script.Parent.ValueSlider
+				local ValueFill = ValueSlider.Fill
+				local ValueMarker = ValueFill.Marker
+				
+				local ValueMeta = {
+					Text = 'Slider';
+					SecondaryText = nil;
+					Dec = true;
+					Min = 0;
+					Max = 1;
+					Value = 1;
+					OnUpdate = function(...) end,
+				}
+				
+				local S1_MouseDown = false
+				local S1_MouseEnter = false
+				
+				local Min, Max, Value = ValueMeta.Min, ValueMeta.Max, ValueMeta.Value
+				
+				ValueFill.Size = UDim2.new((Value - Min) / (Max - Min), 0, 1, 0)
+				
+				local function update_value()
+					local mouse_x = math.clamp(Mouse.X - ValueSlider.AbsolutePosition.X, Min, ValueSlider.AbsoluteSize.X)
+				
+					if ValueMeta.Dec then
+						ValueMeta.Value = (math.clamp((mouse_x / ValueSlider.AbsoluteSize.X) * (Max - Min) + Min, Min, Max))
+						print(tostring(ValueMeta.Value))
+						SetColor({ Val = ValueMeta.Value})
+					elseif not ValueMeta.Dec then
+						ValueMeta.Value = math.floor(math.clamp((mouse_x / ValueSlider.AbsoluteSize.X) * (Max - Min) + Min, Min, Max))
+						print(ValueMeta.Value)
+						SetColor({ Val = ValueMeta.Value})
+					end
+				
+					ValueFill.Size = UDim2.new((ValueMeta.Value - Min) / (Max - Min), 0, 1, 0)
+					ValueMeta.OnUpdate(ValueMeta.Value)
+				end
+				
+				Mouse.Move:Connect(function() if S1_MouseDown then update_value() end end)
+				
+				ValueMarker.MouseButton1Down:Connect(function() S1_MouseDown = true update_value() end)
+				ValueMarker.MouseButton1Up:Connect(function() S1_MouseDown = false end)
+				ValueSlider.MouseEnter:Connect(function() S1_MouseEnter = true end)
+				ValueSlider.MouseLeave:Connect(function() S1_MouseEnter = false  end)
+				
+				Services.UserInputService.InputEnded:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.MouseButton1 then
+						S1_MouseDown = false
+					end
+				end)
+				
+				-- >> Alpha Slider Control
+				local AlphaSlider = script.Parent.AlphaSlider
+				local AlphaFill = AlphaSlider.Fill
+				local AlphaMarker = AlphaFill.Marker
+				
+				local AlphaMeta = {
+					Text = 'Slider';
+					SecondaryText = nil;
+					Dec = true;
+					Min = 0;
+					Max = 1;
+					Value = 1;
+					OnUpdate = function(...) end,
+				}
+				
+				local S2_MouseDown = false
+				local S2_MouseEnter = false
+				
+				local Min, Max, Value = AlphaMeta.Min, AlphaMeta.Max, AlphaMeta.Value
+				
+				AlphaFill.Size = UDim2.new((Value - Min) / (Max - Min), 0, 1, 0)
+				
+				local function UpdateAlpha()
+					local mouse_x = math.clamp(Mouse.X - AlphaSlider.AbsolutePosition.X, Min, AlphaSlider.AbsoluteSize.X)
+				
+					if AlphaMeta.Dec then
+						AlphaMeta.Value = (math.clamp((mouse_x / AlphaSlider.AbsoluteSize.X) * (Max - Min) + Min, Min, Max))
+						print(tostring(AlphaMeta.Value))
+						SetColor({ Alpha = AlphaMeta.Value})
+					elseif not AlphaMeta.Dec then
+						AlphaMeta.Value = math.floor(math.clamp((mouse_x / AlphaSlider.AbsoluteSize.X) * (Max - Min) + Min, Min, Max))
+						print(AlphaMeta.Value)
+						SetColor({ Alpha = AlphaMeta.Value})
+					end
+				
+					AlphaFill.Size = UDim2.new((AlphaMeta.Value - Min) / (Max - Min), 0, 1, 0)
+					AlphaMeta.OnUpdate(AlphaMeta.Value)
+				end
+				
+				Mouse.Move:Connect(function() if S2_MouseDown then UpdateAlpha() end end)
+				
+				AlphaMarker.MouseButton1Down:Connect(function() S2_MouseDown = true UpdateAlpha() end)
+				AlphaMarker.MouseButton1Up:Connect(function() S2_MouseDown = false end)
+				AlphaSlider.MouseEnter:Connect(function() S2_MouseEnter = true end)
+				AlphaSlider.MouseLeave:Connect(function() S2_MouseEnter = false end)
+				
+				Services.UserInputService.InputEnded:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.MouseButton1 then
+						S2_MouseDown = false
+					end
+				end)
 
-				Mouse.Move:connect(update_rgb)
 			end
 
 			return Section
