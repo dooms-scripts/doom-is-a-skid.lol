@@ -1,4 +1,4 @@
---@ doom.dtw | blitz.win | v1.0.9
+--@ doom.dtw | blitz.win | v1.1.0
 --@ patch: 
 --@ 	remade color picker
 --@	added watermark
@@ -163,16 +163,15 @@ function blitz.watermark(text)
 	blitz.create("UICorner", { Parent = WatermarkFrame, CornerRadius = UDim.new(0, 6),})
 
 	WatermarkLabel.Text = text
-	repeat task.wait() until WatermarkLabel.Text == text
+	WatermarkLabel:GetPropertyChangedSignal('TextBounds'):Wait()
 	
 	WatermarkLabel.Size = UDim2.fromOffset(WatermarkLabel.TextBounds.X + 20, 30)	
 	
 	--@ Functions + Connections
 	function Watermark:Edit(new_text)
 		WatermarkLabel.Text = new_text
-		repeat task.wait() until WatermarkLabel.Text == text
+		WatermarkLabel:GetPropertyChangedSignal('TextBounds'):Wait()
 
-		task.wait(.1)
 		WatermarkLabel.Size = UDim2.fromOffset(WatermarkLabel.TextBounds.X + 20, 30)	
 	end
 	
