@@ -1,4 +1,4 @@
---@ doom.dtw | blitz.win | v1.1.0
+--@ doom.dtw | blitz.win | v1.1.1
 --@ patch: 
 --@ 	remade color picker
 --@	added watermark
@@ -14,7 +14,7 @@ end})
 
 --@ library
 blitz = {
-	version = 'v1.0.0';
+	version = 'v1.1.1',
 	cache = Instance.new('Folder');
 	pages = {};
 	win = nil; 
@@ -130,7 +130,7 @@ end
 
 function blitz.update(...)
 	local NewData = ...
-	
+
 	if NewData.accent then
 		for _, Page in blitz.pages do
 			for _, Descendant in Page.Instance:GetDescendants() do
@@ -156,34 +156,32 @@ function blitz.watermark(text)
 		DeltaPos = nil;
 		Hidden = false;
 	}
-	
+
 	--@ Instances
 	local WatermarkFrame = blitz.create("Frame", { Parent = blitz.win, Name = [[Watermark]], AutomaticSize = Enum.AutomaticSize.X, BorderSizePixel = 0, Size = UDim2.new(0, 0, 0, 30), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0.0136208851, 0, 0.0207972266, 0), BackgroundColor3 = Color3.fromRGB(12, 12, 12),})
 	local WatermarkLabel = blitz.create("TextLabel", { Parent = WatermarkFrame, RichText = true, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0.5, 0.5), TextSize = 18, Size = UDim2.new(0, 423, 0, 14), BorderColor3 = Color3.fromRGB(0, 0, 0), FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0.501184821, 0, 0.5, 0), TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1,})
 	blitz.create("UIListLayout", { Parent = WatermarkFrame, VerticalAlignment = Enum.VerticalAlignment.Center, FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder, HorizontalAlignment = Enum.HorizontalAlignment.Center,})
 	blitz.create("UICorner", { Parent = WatermarkFrame, CornerRadius = UDim.new(0, 6),})
 
-	WatermarkLabel.Text = text
-	WatermarkLabel:GetPropertyChangedSignal('TextBounds'):Wait()
+	WatermarkLabel:GetPropertyChangedSignal('TextBounds'):Connect(function()
+		WatermarkLabel.Size = UDim2.fromOffset(WatermarkLabel.TextBounds.X + 20, 30)	
+	end)
 	
-	WatermarkLabel.Size = UDim2.fromOffset(WatermarkLabel.TextBounds.X + 20, 30)	
+	WatermarkLabel.Text = text
 	
 	--@ Functions + Connections
 	function Watermark:Edit(new_text)
 		WatermarkLabel.Text = new_text
-		WatermarkLabel:GetPropertyChangedSignal('TextBounds'):Wait()
-
-		WatermarkLabel.Size = UDim2.fromOffset(WatermarkLabel.TextBounds.X + 20, 30)	
 	end
-	
+
 	function Watermark:Toggle(v)
 		WatermarkFrame.Visible = v
 	end
-	
+
 	function Watermark:Destroy()
 		WatermarkFrame:Destroy()
 	end
-	
+
 	--@ Functions + Connections
 	Services.UserInputService.InputBegan:Connect(function(Input)
 		local InputType = Input.UserInputType
@@ -218,7 +216,7 @@ function blitz.watermark(text)
 			end
 		end
 	end)
-	
+
 	return Watermark
 end
 
@@ -417,14 +415,14 @@ function blitz.new(name, ...)
 				blitz.tween(Page.Button:FindFirstChildOfClass('ImageLabel'), { ImageColor3 = Color3.fromRGB(125, 125, 125) })
 				blitz.tween(Page.Button:FindFirstChildOfClass('UIStroke'), { Transparency = 1 })
 				blitz.tween(Page.Button:FindFirstChildOfClass('Frame'), { BackgroundTransparency = 1 })
-				
+
 				Page.Button:SetAttribute('Accent', false)
 				Page.Button:FindFirstChildOfClass('TextLabel'):SetAttribute('Accent', false)
 				Page.Button:FindFirstChildOfClass('ImageLabel'):SetAttribute('Accent', false)
 			end
 
 			TabFrame.Visible = true
-			
+
 			--@ attributes
 			TabButton:SetAttribute('Accent', true)
 			ButtonText:SetAttribute('Accent', true)
@@ -573,7 +571,7 @@ function blitz.new(name, ...)
 				blitz.create("UICorner", { Parent = Circle, CornerRadius = UDim.new(1, 0),})
 				blitz.create("UIAspectRatioConstraint", { Parent = Circle,})
 				blitz.create("UIPadding", { Parent = ElementButton, PaddingRight = UDim.new(0, 4), PaddingLeft = UDim.new(0, 4),})
-				
+
 				ElementButton:SetAttribute('Accent', Meta.Value)
 				ElementButton.BackgroundColor3 = Meta.Value and blitz.accent or Color3.fromRGB(32, 32, 32)
 				Circle.Position = Meta.Value and UDim2.new(1, 0, 0.5, 0) or UDim2.new(0, 0, 0.5, 0)
@@ -1011,7 +1009,7 @@ function blitz.new(name, ...)
 				local Marker3 = blitz.create("ImageButton", { Parent = Fill2, Name = [[Marker]], AnchorPoint = Vector2.new(0.5, 0.5), Image = [[rbxasset://textures/ui/GuiImagePlaceholder.png]], BorderSizePixel = 0, Size = UDim2.new(0, 6, 0, 6), ImageTransparency = 1, BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(1, 0, 0.5, 0), BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 				local CheckerPattern2 = blitz.create("ImageLabel", { Parent = AlphaSlider, Name = [[CheckerPattern]], AnchorPoint = Vector2.new(0.5, 0.5), Image = [[rbxassetid://14727168439]], ImageTransparency = 1, TileSize = UDim2.new(0.0250000004, 0, 1, 0), ZIndex = 0, BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), ScaleType = Enum.ScaleType.Tile, BorderColor3 = Color3.fromRGB(0, 0, 0), ImageColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
 				local CloseButton = blitz.create("TextButton", { Parent = ColorPicker, Name = [[CloseButton]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(1, 0), TextSize = 14, Size = UDim2.new(0, 28, 0, 24), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[x]], Font = Enum.Font.Michroma, Position = UDim2.new(1, 0, 0, 0), TextColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 1,})
-				
+
 				blitz.create("UIStroke", { Parent = Marker, Color = Color3.fromRGB(255, 255, 255),})
 				blitz.create("UIStroke", { Parent = Marker2,})
 				blitz.create("UIStroke", { Parent = Marker3,})
@@ -1037,7 +1035,7 @@ function blitz.new(name, ...)
 				blitz.create("UIGradient", { Parent = CheckerPattern2, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0, 0); NumberSequenceKeypoint.new(1, 1, 0);}),})
 				blitz.create("UIAspectRatioConstraint", { Parent = BrushIcon, })
 				blitz.create("UIAspectRatioConstraint", { Parent = ColorCircle,})
-				
+
 				--@ Functions + Connections
 				ElementButton.MouseButton1Click:Connect(function()
 					if WindowFrame:FindFirstChild('ColorPicker') then
@@ -1047,7 +1045,7 @@ function blitz.new(name, ...)
 					Meta.Hidden = not Meta.Hidden
 					ColorPicker.Parent = Meta.Hidden and WindowFrame or blitz.cache
 				end)
-				
+
 				CloseButton.MouseButton1Click:Connect(function()
 					Meta.Hidden = true
 					ColorPicker.Parent = blitz.cache
@@ -1102,13 +1100,13 @@ function blitz.new(name, ...)
 
 				local function SetColor(...)
 					ColorData = overwrite(ColorData, ... or {})
-					
+
 					Color_RGB = Color3.fromHSV(
 						ColorData.Hue,
 						ColorData.Sat,
 						ColorData.Val
 					)
-					
+
 					ColorData.RGB = Color3.fromRGB(
 						Color_RGB.R * 255,
 						Color_RGB.G * 255,
@@ -1291,7 +1289,5 @@ function blitz.new(name, ...)
 
 	return Window
 end
-
-print(blitz.version)
 
 return blitz
