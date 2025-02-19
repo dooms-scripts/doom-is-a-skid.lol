@@ -1,4 +1,4 @@
---@ doom.dtw | blitz.win | v1.0.8
+--@ doom.dtw | blitz.win | v1.0.9
 --@ patch: 
 --@ 	remade color picker
 --@	added watermark
@@ -163,15 +163,16 @@ function blitz.watermark(text)
 	blitz.create("UICorner", { Parent = WatermarkFrame, CornerRadius = UDim.new(0, 6),})
 
 	WatermarkLabel.Text = text
+	repeat task.wait() until WatermarkLabel.Text = text
 	
-	task.wait()
 	WatermarkLabel.Size = UDim2.fromOffset(WatermarkLabel.TextBounds.X + 20, 30)	
 	
 	--@ Functions + Connections
 	function Watermark:Edit(new_text)
 		WatermarkLabel.Text = new_text
+		repeat task.wait() until WatermarkLabel.Text = text
 
-		task.wait()
+		task.wait(.1)
 		WatermarkLabel.Size = UDim2.fromOffset(WatermarkLabel.TextBounds.X + 20, 30)	
 	end
 	
@@ -565,7 +566,7 @@ function blitz.new(name, ...)
 
 				--@ Instance Creation
 				local ElementFrame = blitz.create("Frame", { Parent = SectionContent, Name = [[ElementFrame]], BorderSizePixel = 0, Size = UDim2.new(1, 0, 0, 36), BorderColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255),})
-				local ElementTitle = blitz.create("TextLabel", { Parent = ElementFrame, Name = [[ElementText]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0, 0.5), TextSize = 20, Size = UDim2.new(1, 0, 1, 0), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[Toggle]], FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0, 0, 0.5, 0), TextColor3 = Color3.fromRGB(175, 175, 175), BackgroundTransparency = 1,})
+				local ElementTitle = blitz.create("TextLabel", { Parent = ElementFrame, Name = [[ElementText]], BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(0, 0.5), TextSize = 20, Size = UDim2.new(1, 0, 1, 0), TextXAlignment = Enum.TextXAlignment.Left, BorderColor3 = Color3.fromRGB(0, 0, 0), Text = Meta.Text, FontFace = Font.new('rbxassetid://12187607287', Enum.FontWeight.Regular, Enum.FontStyle.Normal), Position = UDim2.new(0, 0, 0.5, 0), TextColor3 = Color3.fromRGB(175, 175, 175), BackgroundTransparency = 1,})
 				local ElementButton = blitz.create("TextButton", { Parent = ElementFrame, Name = [[ElementButton]], BorderSizePixel = 0, AutoButtonColor = false, BackgroundColor3 = blitz.accent, AnchorPoint = Vector2.new(1, 0.5), TextSize = 14, Size = UDim2.new(0, 44, 0, 20), BorderColor3 = Color3.fromRGB(0, 0, 0), Text = [[]], Font = Enum.Font.SourceSans, Position = UDim2.new(1, 0, 0.5, 0), TextColor3 = Color3.fromRGB(0, 0, 0),}, { ["Accent"] = true })
 				local Circle = blitz.create("ImageLabel", { Parent = ElementButton, BorderSizePixel = 0, BackgroundColor3 = Color3.fromRGB(255, 255, 255), AnchorPoint = Vector2.new(1, 0.5), Size = UDim2.new(1, -6, 1, -6), BorderColor3 = Color3.fromRGB(0, 0, 0), Position = UDim2.new(1, 0, 0.5, 0),})
 				blitz.create("UICorner", { Parent = ElementButton, CornerRadius = UDim.new(1, 0),})
