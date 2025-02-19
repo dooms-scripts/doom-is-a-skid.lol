@@ -14,6 +14,7 @@ end})
 
 --@ library
 blitz = {
+	version = 'v1.0.0';
 	cache = Instance.new('Folder');
 	pages = {};
 	win = nil; 
@@ -1290,5 +1291,7 @@ function blitz.new(name, ...)
 
 	return Window
 end
+
+print(blitz.version)
 
 return blitz
